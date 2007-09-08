@@ -2,6 +2,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#define FILE_BUFFER_SIZE (1024*512)
+
 @interface SoundFile : NSDocument
 {
     SNDFILE *sndfile;
@@ -10,6 +12,12 @@
     BOOL is_playing;
     const char *fname;
     AudioUnit au_unit;
+    NSTimer *timer;
+    int current_buffer_pos;
+    float file_buffer[FILE_BUFFER_SIZE];
+    NSLock *lock;
+    int current_buffer_start;
+    sf_count_t buffer_vpos;
 
     IBOutlet NSTextField *string_artist;
     IBOutlet NSTextField *string_comment;
@@ -30,7 +38,8 @@
     IBOutlet NSPopUpButton *right_channel;
     IBOutlet NSSlider *play_slider;
     IBOutlet NSTextField *play_pos;
-
 }
+
+- (IBAction) play : (id) sender;
 
 @end

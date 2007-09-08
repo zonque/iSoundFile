@@ -6,52 +6,74 @@
 #import <AudioUnit/AudioOutputUnit.h>
 #import <AudioUnit/AudioUnitProperties.h>
 #import <AudioUnit/AudioUnitParameters.h>
-   
+
 #import <sndfile.h>
 #import "SoundFile.h"
 
 
 @implementation SoundFile
 
-#define BUFSIZE 512
-static OSStatus ao_coreaudio_render_proc (void *this,
+- (int) read_buffered: (float **) buf : (int) num
+{
+    *buf = file_buffer + current_buffer_start;
+
+    if (buffer_vpos + (num * sfinfo.channels) > sfinfo.frames)
+        num -= (buffer_vpos + (num * sfinfo.channels)) - sfinfo.frames;
+    
+    current_buffer_start += num;
+    buffer_vpos += num;
+    return num;
+}
+
+- (void) update_buffer
+{
+    if (current_buffer_start > FILE_BUFFER_SIZE/2) {
+        printf("rebuffering.\n");
+        int rest = FILE_BUFFER_SIZE - current_buffer_start;
+        memmove(file_buffer, file_buffer + current_buffer_start, rest * sizeof(float));
+        current_buffer_start = 0;
+        sf_read_float(sndfile, file_buffer + rest, FILE_BUFFER_SIZE - rest);
+    }
+}
+
+static OSStatus sf_coreaudio_render_proc (void *this,
                                           AudioUnitRenderActionFlags *ioActionFlags,
                                           const AudioTimeStamp *inTimeStamp,
                                           unsigned int inBusNumber,
-                                          unsigned int ca_frames_left,
+                                          unsigned int inNumberFrames,
                                           AudioBufferList * ioData)
 {
     SoundFile *sf = (SoundFile *) this;
-    int file_frames_left = (ca_frames_left / 2) * sf->sfinfo.channels;
     int left_map =  [sf->left_channel  indexOfSelectedItem];
     int right_map = [sf->right_channel indexOfSelectedItem];
-    int *destbuf = ioData->mBuffers[0].mData;
+    int to_read = (inNumberFrames / 2) * sf->sfinfo.channels;
+    float *destbuf = ioData->mBuffers[0].mData;
+    int frames_read = 0;
 
-    while (ca_frames_left > 0) {
-        int buf[BUFSIZE];
-        int *p = buf;
-        int to_read = MAX(file_frames_left, BUFSIZE);
-        int r = sf_read_int(sf->sndfile, buf, to_read);
-        int i;
-        
+    while (frames_read < inNumberFrames) {
+        float *buf;
+        int r = [sf read_buffered: &buf : to_read];
+        frames_read += r / sf->sfinfo.channels;
+        float *p = buf;
+
         if (r < to_read) {
-            //EOF
-            [sf play];
+            [sf play: nil];
             return noErr;
         }
         
-        for (i=0; i < r; i++) {
-            destbuf[i*2 + 0] = *(p + left_map);
-            destbuf[i*2 + 1] = *(p + right_map);                
+        while (r > 0) {
+            destbuf[0] = p[left_map];
+            destbuf[1] = p[right_map];
+            destbuf += 2;
             p += sf->sfinfo.channels;
-            ca_frames_left--;
+            r -= sf->sfinfo.channels;
         }
     }
 
+    [sf->play_slider setIntValue: [sf->play_slider intValue] + frames_read];
+    //[sf updatePlayPos];
     return noErr;
 }
-
-
 
 - (void) initCoreAudio
 {
@@ -92,7 +114,7 @@ static OSStatus ao_coreaudio_render_proc (void *this,
 
 
   /* set up the render procedure */
-  input.inputProc = (AURenderCallback) ao_coreaudio_render_proc;
+  input.inputProc = (AURenderCallback) sf_coreaudio_render_proc;
   input.inputProcRefCon = self;
 
   AudioUnitSetProperty (converter_unit,
@@ -112,14 +134,10 @@ static OSStatus ao_coreaudio_render_proc (void *this,
   /* set up the audio format we want to use */
   format.mSampleRate   = sfinfo.samplerate;
   format.mFormatID     = kAudioFormatLinearPCM;
-  format.mFormatFlags  = kLinearPCMFormatFlagIsSignedInteger
-#ifdef WORDS_BIGENDIAN
-                       | kLinearPCMFormatFlagIsBigEndian
-#endif
-                       | kLinearPCMFormatFlagIsPacked;
-  format.mBitsPerChannel   = 24;
+  format.mFormatFlags  = kAudioFormatFlagIsFloat | kAudioFormatFlagIsBigEndian;
+  format.mBitsPerChannel   = 32;
   format.mChannelsPerFrame = 2;
-  format.mBytesPerFrame    = 2 * (24 / 8);
+  format.mBytesPerFrame    = 2 * (32 / 8);
   format.mFramesPerPacket  = 1;
   format.mBytesPerPacket   = format.mBytesPerFrame;
  
@@ -219,7 +237,10 @@ static OSStatus ao_coreaudio_render_proc (void *this,
         [right_channel addItemWithTitle: [NSString stringWithFormat: @"Channel #%d", i]];
     }
     
-    [right_channel selectItemAtIndex: 2 % sfinfo.channels];
+    if (sfinfo.channels > 1)
+        [right_channel selectItemAtIndex: 1];
+    
+    lock = [[NSLock alloc] init];
     [self initCoreAudio];
 }
 
@@ -312,6 +333,12 @@ static OSStatus ao_coreaudio_render_proc (void *this,
     return modified;
 }
 
+- (void)close
+{
+    AudioOutputUnitStop(au_unit);
+    [super close];
+}
+
 - (IBAction)set_string:(id)sender
 {
     if (read_only)
@@ -320,18 +347,29 @@ static OSStatus ao_coreaudio_render_proc (void *this,
     modified = YES;
 }
 
-- (IBAction)play_slider_moved:(id)sender
+- (void)updatePlayPos
 {
-    sf_count_t current_play_pos = [sender intValue];    
-
+    sf_count_t current_play_pos = [play_slider intValue];
     [play_pos setStringValue: [NSString stringWithFormat: @"%llu:%02llu:%02llu.%03llu",
                                     (current_play_pos / (sfinfo.samplerate * 60ULL * 60ULL)),
                                     (current_play_pos / (sfinfo.samplerate * 60ULL)) % 60ULL,
                                     (current_play_pos / sfinfo.samplerate) % 60ULL,
                                     ((current_play_pos % sfinfo.samplerate) * 1000ULL) / sfinfo.samplerate ]];
+}
 
-    current_play_pos = [sender intValue];
-    sf_seek(sndfile, current_play_pos, SEEK_SET);
+- (IBAction)play_slider_moved:(id)sender
+{
+    [self updatePlayPos];
+    buffer_vpos = [sender intValue];
+    sf_seek(sndfile, buffer_vpos, SEEK_SET);
+    current_buffer_start = 0;
+    sf_read_float(sndfile, file_buffer, FILE_BUFFER_SIZE);
+}
+
+- (void) timerCallback : (NSTimer *) timer
+{
+    [self update_buffer];
+    [self updatePlayPos];
 }
 
 - (IBAction)play:(id)sender
@@ -341,12 +379,20 @@ static OSStatus ao_coreaudio_render_proc (void *this,
     is_playing ^= 1;
 
     if (is_playing) {
+        buffer_vpos = current_buffer_start = 0;
+        sf_read_float(sndfile, file_buffer, FILE_BUFFER_SIZE);
         err = AudioOutputUnitStart(au_unit);
         if (err) {
             printf("AudioOutputUnitStart returned %d\n", err);
             return;
         }
+        timer = [NSTimer
+            timerWithTimeInterval: .1
+            target:self selector:@selector(timerCallback:)
+            userInfo:nil repeats:YES];
 
+        // add it to the main run loop
+        [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
         [play_button setTitle: @"pause"];
     } else {
         err = AudioOutputUnitStop(au_unit);
@@ -354,7 +400,7 @@ static OSStatus ao_coreaudio_render_proc (void *this,
             printf("AudioOutputUnitStop returned %d\n", err);
             return;
         }
-
+        [timer invalidate];
         [play_button setTitle: @"play"];
     }
 }
