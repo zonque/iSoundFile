@@ -25,11 +25,6 @@
                 "string_title" = NSTextField; 
             }; 
             SUPERCLASS = NSDocument; 
-        }, 
-        {
-            CLASS = SoundFileWindowController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSWindowController; 
         }
     ); 
     IBVersion = 1; 

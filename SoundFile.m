@@ -10,13 +10,17 @@
 #import <sndfile.h>
 #import "SoundFile.h"
 
-
 @implementation SoundFile
 
 - (int) read_buffered: (float **) buf : (int) num
 {
+    if (current_buffer_start >= FILE_BUFFER_SIZE) {
+        *buf = file_buffer;
+        return num;
+    }
+        
     *buf = file_buffer + current_buffer_start;
-
+  
     if (buffer_vpos + (num * sfinfo.channels) > sfinfo.frames)
         num -= (buffer_vpos + (num * sfinfo.channels)) - sfinfo.frames;
     
@@ -56,8 +60,10 @@ static OSStatus sf_coreaudio_render_proc (void *this,
         frames_read += r / sf->sfinfo.channels;
         float *p = buf;
 
+        [sf->play_slider setIntValue: [sf->play_slider intValue] + frames_read];
+
         if (r < to_read) {
-            [sf play: nil];
+            [sf eof];
             return noErr;
         }
         
@@ -70,8 +76,6 @@ static OSStatus sf_coreaudio_render_proc (void *this,
         }
     }
 
-    [sf->play_slider setIntValue: [sf->play_slider intValue] + frames_read];
-    //[sf updatePlayPos];
     return noErr;
 }
 
@@ -158,7 +162,6 @@ static OSStatus sf_coreaudio_render_proc (void *this,
       printf("failed to AudioUnitInitialize(au_unit)\n");
       return;
   }
-
 }
 
 - (NSString *)windowNibName
@@ -167,6 +170,19 @@ static OSStatus sf_coreaudio_render_proc (void *this,
     // If you need to use a subclass of NSWindowController or if your document supports multiple NSWindowControllers, you should remove this method and override -makeWindowControllers instead.
     return @"SoundFile";
 }
+
+- (void) fileBufferThread
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    while(1) {
+        [self update_buffer];
+        usleep(1000000);
+    }
+    
+    [pool release];
+}
+
 
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController
 {
@@ -242,15 +258,9 @@ static OSStatus sf_coreaudio_render_proc (void *this,
     
     lock = [[NSLock alloc] init];
     [self initCoreAudio];
-}
-
-- (NSData *)dataRepresentationOfType:(NSString *)aType
-{
-    // Insert code here to write your document from the given data.  You can also choose to override -fileWrapperRepresentationOfType: or -writeToFile:ofType: instead.
-    
-    // For applications targeted for Tiger or later systems, you should use the new Tiger API -dataOfType:error:.  In this case you can also choose to override -writeToURL:ofType:error:, -fileWrapperOfType:error:, or -writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
-
-    return nil;
+    current_buffer_start = 0;
+    sf_read_float(sndfile, file_buffer, FILE_BUFFER_SIZE);
+    [NSThread detachNewThreadSelector:@selector(fileBufferThread) toTarget:self withObject:nil];
 }
 
 - (BOOL)readFromURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
@@ -336,6 +346,10 @@ static OSStatus sf_coreaudio_render_proc (void *this,
 - (void)close
 {
     AudioOutputUnitStop(au_unit);
+    if (timer) {
+        [timer invalidate];
+        timer = nil;
+    }
     [super close];
 }
 
@@ -357,6 +371,8 @@ static OSStatus sf_coreaudio_render_proc (void *this,
                                     ((current_play_pos % sfinfo.samplerate) * 1000ULL) / sfinfo.samplerate ]];
 }
 
+
+
 - (IBAction)play_slider_moved:(id)sender
 {
     [self updatePlayPos];
@@ -368,7 +384,6 @@ static OSStatus sf_coreaudio_render_proc (void *this,
 
 - (void) timerCallback : (NSTimer *) timer
 {
-    [self update_buffer];
     [self updatePlayPos];
 }
 
@@ -379,8 +394,6 @@ static OSStatus sf_coreaudio_render_proc (void *this,
     is_playing ^= 1;
 
     if (is_playing) {
-        buffer_vpos = current_buffer_start = 0;
-        sf_read_float(sndfile, file_buffer, FILE_BUFFER_SIZE);
         err = AudioOutputUnitStart(au_unit);
         if (err) {
             printf("AudioOutputUnitStart returned %d\n", err);
@@ -400,9 +413,21 @@ static OSStatus sf_coreaudio_render_proc (void *this,
             printf("AudioOutputUnitStop returned %d\n", err);
             return;
         }
-        [timer invalidate];
+
+        if (timer) {
+            [timer invalidate];
+            timer = nil;
+        }
+        
         [play_button setTitle: @"play"];
     }
+}
+
+- (IBAction) eof
+{
+    [self play: nil];
+    [play_slider setIntValue: 0];
+    [self play_slider_moved: play_slider];
 }
 
 
