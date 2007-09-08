@@ -10,6 +10,7 @@
 		8B310CF80C92BCE10089FE97 /* SoundFile.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8B310CF60C92BCE10089FE97 /* SoundFile.nib */; };
 		8BD4A5B30C92C60400243C91 /* SoundFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BD4A5B20C92C60400243C91 /* SoundFile.m */; };
 		8BD4A5F80C92C93F00243C91 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD4A5F70C92C93F00243C91 /* libsndfile.a */; };
+		8BD4A73F0C92E24800243C91 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD4A73E0C92E24800243C91 /* CoreAudio.framework */; };
 		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
 		8D15AC2D0486D014006FF6A4 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
@@ -31,6 +32,7 @@
 		8BD4A5B10C92C60400243C91 /* SoundFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SoundFile.h; sourceTree = "<group>"; };
 		8BD4A5B20C92C60400243C91 /* SoundFile.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SoundFile.m; sourceTree = "<group>"; };
 		8BD4A5F70C92C93F00243C91 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsndfile.a; sourceTree = "<group>"; };
+		8BD4A73E0C92E24800243C91 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* iSoundFile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iSoundFile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -42,6 +44,7 @@
 			files = (
 				8BD4A5F80C92C93F00243C91 /* libsndfile.a in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
+				8BD4A73F0C92E24800243C91 /* CoreAudio.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +80,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* iSoundFile */ = {
 			isa = PBXGroup;
 			children = (
+				8BD4A73E0C92E24800243C91 /* CoreAudio.framework */,
 				8BD4A5F70C92C93F00243C91 /* libsndfile.a */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
