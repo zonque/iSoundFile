@@ -1,0 +1,26 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {"set_string" = id; }; 
+            CLASS = SoundFile; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "label_bitdepth" = NSTextField; 
+                "label_channels" = NSTextField; 
+                "label_format" = NSTextField; 
+                "label_frames" = NSTextField; 
+                "label_length" = NSTextField; 
+                "label_samplerate" = NSTextField; 
+                "string_artist" = NSTextField; 
+                "string_comment" = NSTextField; 
+                "string_copyright" = NSTextField; 
+                "string_date" = NSTextField; 
+                "string_software" = NSTextField; 
+                "string_title" = NSTextField; 
+            }; 
+            SUPERCLASS = NSDocument; 
+        }
+    ); 
+    IBVersion = 1; 
+}
