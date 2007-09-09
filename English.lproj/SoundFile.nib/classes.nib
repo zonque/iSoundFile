@@ -2,7 +2,12 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {play = id; "play_slider_moved" = id; "set_string" = id; }; 
+            ACTIONS = {
+                play = id; 
+                "play_slider_moved" = id; 
+                setOutputMapping = id; 
+                "set_string" = id; 
+            }; 
             CLASS = SoundFile; 
             LANGUAGE = ObjC; 
             OUTLETS = {

@@ -8,164 +8,11 @@
 #import <AudioUnit/AudioUnitParameters.h>
 
 #import <sndfile.h>
+#import "AudioRenderer.h"
 #import "SoundFile.h"
 
 @implementation SoundFile
 
-- (int) read_buffered: (float **) buf : (int) num
-{
-    if (current_buffer_start >= FILE_BUFFER_SIZE) {
-        bzero(file_buffer, num * sizeof(float));
-        *buf = file_buffer;
-        return num;
-    }
-        
-    *buf = file_buffer + current_buffer_start;
-  
-    if (buffer_vpos + (num * sfinfo.channels) > sfinfo.frames)
-        num -= (buffer_vpos + (num * sfinfo.channels)) - sfinfo.frames;
-    
-    current_buffer_start += num;
-    buffer_vpos += num;
-    return num;
-}
-
-- (void) update_buffer
-{
-    if (current_buffer_start > FILE_BUFFER_SIZE/2) {
-        printf("rebuffering.\n");
-        int rest = FILE_BUFFER_SIZE - current_buffer_start;
-        memmove(file_buffer, file_buffer + current_buffer_start, rest * sizeof(float));
-        current_buffer_start = 0;
-        sf_read_float(sndfile, file_buffer + rest, FILE_BUFFER_SIZE - rest);
-    }
-}
-
-static OSStatus sf_coreaudio_render_proc (void *this,
-                                          AudioUnitRenderActionFlags *ioActionFlags,
-                                          const AudioTimeStamp *inTimeStamp,
-                                          unsigned int inBusNumber,
-                                          unsigned int inNumberFrames,
-                                          AudioBufferList * ioData)
-{
-    SoundFile *sf = (SoundFile *) this;
-    int left_map =  [sf->left_channel  indexOfSelectedItem];
-    int right_map = [sf->right_channel indexOfSelectedItem];
-    int to_read = (inNumberFrames / 2) * sf->sfinfo.channels;
-    float *destbuf = ioData->mBuffers[0].mData;
-    int frames_read = 0;
-
-    while (frames_read < inNumberFrames) {
-        float *buf;
-        int r = [sf read_buffered: &buf : to_read];
-        frames_read += r / sf->sfinfo.channels;
-        float *p = buf;
-
-        [sf->play_slider setIntValue: [sf->play_slider intValue] + frames_read];
-
-        if (r < to_read) {
-            [sf eof];
-            return noErr;
-        }
-        
-        while (r > 0) {
-            destbuf[0] = p[left_map];
-            destbuf[1] = p[right_map];
-            destbuf += 2;
-            p += sf->sfinfo.channels;
-            r -= sf->sfinfo.channels;
-        }
-    }
-
-    return noErr;
-}
-
-- (void) initCoreAudio
-{
-    OSStatus err;
-    AURenderCallbackStruct input;
-    ComponentDescription desc;
-    Component au_component, converter_component;
-    AudioStreamBasicDescription format;
-    AudioUnitConnection connection;
-    AudioUnit converter_unit;
-    
-    /* find an audio output unit */
-    desc.componentType = kAudioUnitType_Output;
-    desc.componentSubType = kAudioUnitSubType_DefaultOutput;
-    desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-    desc.componentFlags = 0;
-    desc.componentFlagsMask = 0;    
-    au_component = FindNextComponent (NULL, &desc);
-
-    if (au_component == NULL) {
-        printf("Unable to find a usable audio output unit component\n");
-        return;
-    }
-    
-    OpenAComponent (au_component, &au_unit);
-
-    /* find a converter unit */
-    desc.componentType = kAudioUnitType_FormatConverter;
-    desc.componentSubType = kAudioUnitSubType_AUConverter;    
-    converter_component = FindNextComponent(NULL, &desc);
-
-    if (converter_component == NULL) {
-        printf("Unable to find a usable audio converter unit component\n");
-        return;
-    }
-    
-    OpenAComponent(converter_component, &converter_unit);
-
-
-  /* set up the render procedure */
-  input.inputProc = (AURenderCallback) sf_coreaudio_render_proc;
-  input.inputProcRefCon = self;
-
-  AudioUnitSetProperty (converter_unit,
-                        kAudioUnitProperty_SetRenderCallback,
-                        kAudioUnitScope_Input,
-                        0, &input, sizeof(input));
-
-  /* connect the converter unit to the audio output unit */
-  connection.sourceAudioUnit = converter_unit;
-  connection.sourceOutputNumber = 0;
-  connection.destInputNumber = 0;
-  AudioUnitSetProperty (au_unit,
-                        kAudioUnitProperty_MakeConnection,
-                        kAudioUnitScope_Input, 0, 
-                        &connection, sizeof(connection));
-
-  /* set up the audio format we want to use */
-  format.mSampleRate   = sfinfo.samplerate;
-  format.mFormatID     = kAudioFormatLinearPCM;
-  format.mFormatFlags  = kAudioFormatFlagIsFloat 
-  format.mFormatFlags = kAudioFormatFlagsNativeFloatPacked;
-    
-  format.mBitsPerChannel   = 32;
-  format.mChannelsPerFrame = 2;
-  format.mBytesPerFrame    = 2 * (32 / 8);
-  format.mFramesPerPacket  = 1;
-  format.mBytesPerPacket   = format.mBytesPerFrame;
- 
-  AudioUnitSetProperty (converter_unit,
-                        kAudioUnitProperty_StreamFormat,
-                        kAudioUnitScope_Input,
-                        0, &format, sizeof (format));
-
-  /* boarding completed, now initialize and start the units... */
-  err = AudioUnitInitialize (converter_unit);
-  if (err) {
-      printf("failed to AudioUnitInitialize(converter_unit)\n");
-      return;
-  }
-
-  err = AudioUnitInitialize (au_unit);
-  if (err) {
-      printf("failed to AudioUnitInitialize(au_unit)\n");
-      return;
-  }
-}
 
 - (NSString *)windowNibName
 {
@@ -245,11 +92,21 @@ static OSStatus sf_coreaudio_render_proc (void *this,
     
     if (sfinfo.channels > 1)
         [right_channel selectItemAtIndex: 1];
-    
-    lock = [[NSLock alloc] init];
-    [self initCoreAudio];
-    current_buffer_start = 0;
-    sf_read_float(sndfile, file_buffer, FILE_BUFFER_SIZE);
+        
+    audioRenderer = [[AudioRenderer alloc] init];
+    [audioRenderer set_sndfile: sndfile : &sfinfo];
+
+    [audioRenderer setLeftOutputMapping:  [left_channel indexOfSelectedItem]];
+    [audioRenderer setRightOutputMapping: [right_channel indexOfSelectedItem]];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+		selector:@selector(filePositionChanged:)
+		name:@"filePositionChanged" object:audioRenderer];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+		selector:@selector(eof:)
+		name:@"EOF" object:audioRenderer];
+
 }
 
 - (BOOL)readFromURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
@@ -273,9 +130,19 @@ static OSStatus sf_coreaudio_render_proc (void *this,
 
     bzero(&sfinfo, sizeof(sfinfo));
     sndfile = sf_open(fname, read_only ? SFM_READ : SFM_RDWR, &sfinfo);
-    if (!sndfile)
-        return NO;
+    
+    if (!sndfile) {
+        char err[0x100];
+        sf_error_str(sndfile, err, sizeof(err));
+        printf ("fname = >%s< err = >%s<\n", fname, err);
+//        *outError = [NSError errorWithDomain: @"libsndfileError" code:-1
+//                    userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithCString: err], NSLocalizedDescriptionKey, nil]];
+        *outError = [NSError errorWithDomain:@"fun house errors" code:-10101
+          userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"problems creating image destination for file save", NSLocalizedDescriptionKey, nil]];
 
+        return NO;
+    }
+    
     return YES;
 }
 
@@ -317,7 +184,7 @@ static OSStatus sf_coreaudio_render_proc (void *this,
             sf_set_string(sndfile, SF_STR_DATE, tmp);
 
         sf_write_sync(sndfile);
-
+        sf_command(sndfile, SFC_UPDATE_HEADER_NOW, NULL, 0);
     } else {
         /* "save as" - not yes impl. */
         return NO;
@@ -334,11 +201,18 @@ static OSStatus sf_coreaudio_render_proc (void *this,
 
 - (void)close
 {
-    AudioOutputUnitStop(au_unit);
+    [audioRenderer release];
+    
     if (timer) {
         [timer invalidate];
         timer = nil;
     }
+    
+    if (sndfile) {
+        sf_close(sndfile);
+        sndfile = nil;
+    }
+    
     [super close];
 }
 
@@ -365,45 +239,32 @@ static OSStatus sf_coreaudio_render_proc (void *this,
 - (IBAction)play_slider_moved:(id)sender
 {
     [self updatePlayPos];
-    buffer_vpos = [sender intValue];
-    sf_seek(sndfile, buffer_vpos, SEEK_SET);
-    current_buffer_start = 0;
-    sf_read_float(sndfile, file_buffer, FILE_BUFFER_SIZE);
+    [audioRenderer seek: [sender intValue]];
 }
 
 - (void) timerCallback : (NSTimer *) timer
 {
-    [self update_buffer];
+    [audioRenderer update_buffer];
     [self updatePlayPos];
 }
 
 - (IBAction)play:(id)sender
 {
-    OSStatus err;
-
     is_playing ^= 1;
 
     if (is_playing) {
-        err = AudioOutputUnitStart(au_unit);
-        if (err) {
-            printf("AudioOutputUnitStart returned %d\n", err);
-            return;
-        }
         timer = [NSTimer
             timerWithTimeInterval: .1
             target:self selector:@selector(timerCallback:)
             userInfo:nil repeats:YES];
 
+        [audioRenderer play];
+
         // add it to the main run loop
         [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
         [play_button setTitle: @"pause"];
     } else {
-        err = AudioOutputUnitStop(au_unit);
-        if (err) {
-            printf("AudioOutputUnitStop returned %d\n", err);
-            return;
-        }
-
+        [audioRenderer pause];
         if (timer) {
             [timer invalidate];
             timer = nil;
@@ -413,7 +274,20 @@ static OSStatus sf_coreaudio_render_proc (void *this,
     }
 }
 
-- (IBAction) eof
+- (IBAction) setOutputMapping: (id) sender
+{
+    if ([sender tag] == 0)
+        [audioRenderer setLeftOutputMapping: [sender indexOfSelectedItem]];
+    else
+        [audioRenderer setRightOutputMapping: [sender indexOfSelectedItem]];
+}
+
+- (IBAction) filePositionChanged: (id) sender
+{
+    [play_slider setIntValue: [audioRenderer currentPosition]];
+}
+
+- (IBAction) eof: (id)sender
 {
     [self play: nil];
     [play_slider setIntValue: 0];
