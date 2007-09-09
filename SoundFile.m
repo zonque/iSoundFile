@@ -15,6 +15,7 @@
 - (int) read_buffered: (float **) buf : (int) num
 {
     if (current_buffer_start >= FILE_BUFFER_SIZE) {
+        bzero(file_buffer, num * sizeof(float));
         *buf = file_buffer;
         return num;
     }
@@ -138,7 +139,9 @@ static OSStatus sf_coreaudio_render_proc (void *this,
   /* set up the audio format we want to use */
   format.mSampleRate   = sfinfo.samplerate;
   format.mFormatID     = kAudioFormatLinearPCM;
-  format.mFormatFlags  = kAudioFormatFlagIsFloat | kAudioFormatFlagIsBigEndian;
+  format.mFormatFlags  = kAudioFormatFlagIsFloat 
+  format.mFormatFlags = kAudioFormatFlagsNativeFloatPacked;
+    
   format.mBitsPerChannel   = 32;
   format.mChannelsPerFrame = 2;
   format.mBytesPerFrame    = 2 * (32 / 8);
@@ -170,19 +173,6 @@ static OSStatus sf_coreaudio_render_proc (void *this,
     // If you need to use a subclass of NSWindowController or if your document supports multiple NSWindowControllers, you should remove this method and override -makeWindowControllers instead.
     return @"SoundFile";
 }
-
-- (void) fileBufferThread
-{
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    while(1) {
-        [self update_buffer];
-        usleep(1000000);
-    }
-    
-    [pool release];
-}
-
 
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController
 {
@@ -260,7 +250,6 @@ static OSStatus sf_coreaudio_render_proc (void *this,
     [self initCoreAudio];
     current_buffer_start = 0;
     sf_read_float(sndfile, file_buffer, FILE_BUFFER_SIZE);
-    [NSThread detachNewThreadSelector:@selector(fileBufferThread) toTarget:self withObject:nil];
 }
 
 - (BOOL)readFromURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
@@ -384,6 +373,7 @@ static OSStatus sf_coreaudio_render_proc (void *this,
 
 - (void) timerCallback : (NSTimer *) timer
 {
+    [self update_buffer];
     [self updatePlayPos];
 }
 
