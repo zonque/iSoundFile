@@ -9,13 +9,31 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>aiff</string>
+				<string>au</string>
+				<string>avr</string>
+				<string>caf</string>
+				<string>htk</string>
+				<string>iff</string>
+				<string>mat</string>
+				<string>mat</string>
+				<string>paf</string>
+				<string>pvf</string>
+				<string>raw</string>
+				<string>sd2</string>
+				<string>sds</string>
+				<string>sf</string>
+				<string>voc</string>
+				<string>w64</string>
 				<string>wav</string>
-				<string>bwf</string>
+				<string>wav</string>
+				<string>wav</string>
+				<string>xi</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string></string>
 			<key>CFBundleTypeName</key>
-			<string>WaveFile</string>
+			<string>Audio file</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>????</string>
@@ -24,23 +42,6 @@
 			<string>Editor</string>
 			<key>NSDocumentClass</key>
 			<string>SoundFile</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>aif</string>
-				<string>aiff</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>AIFF</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSTypeIsPackage</key>
-			<true/>
-			<key>NSDocumentClass</key>
-			<string>SoundFile</string>
-			<key>NSPersistentStoreTypeKey</key>
-			<string>Binary</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>

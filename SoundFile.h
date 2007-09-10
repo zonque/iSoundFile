@@ -6,6 +6,7 @@
 {
     SNDFILE *sndfile;
     SF_INFO  sfinfo;
+    SF_INFO convertSFInfo;
     SF_BROADCAST_INFO bext;
     BOOL read_only, modified;
     BOOL is_playing;
@@ -13,45 +14,63 @@
     NSTimer *timer;
     AudioRenderer *audioRenderer;
     struct stat file_stat;
+    NSURL *url;
+    int convertFormats[0x100];
+        ChannelTableSource *convertTableSource;
 
-    IBOutlet NSTextField *string_artist;
-    IBOutlet NSTextField *string_comment;
-    IBOutlet NSTextField *string_copyright;
-    IBOutlet NSTextField *string_date;
-    IBOutlet NSTextField *string_software;
-    IBOutlet NSTextField *string_title;
+    IBOutlet NSWindow *window;
 
-    IBOutlet NSTextField *label_format;
-    IBOutlet NSTextField *label_samplerate;
-    IBOutlet NSTextField *label_bytes_per_sample;
-    IBOutlet NSTextField *label_channels;
-    IBOutlet NSTextField *label_frames;
-    IBOutlet NSTextField *label_length;
-    IBOutlet NSTextField *label_filesize;
-    IBOutlet NSTextField *label_bytes_per_second;
-    IBOutlet NSTextField *label_sample_format;
-    IBOutlet NSTextField *label_sections;
+    IBOutlet NSTextField *stringArtist;
+    IBOutlet NSTextField *stringComment;
+    IBOutlet NSTextField *stringCopyright;
+    IBOutlet NSTextField *stringDate;
+    IBOutlet NSTextField *stringSoftware;
+    IBOutlet NSTextField *stringTitle;
 
-    IBOutlet NSTextField *bext_coding_history;
-    IBOutlet NSTextField *bext_description;
-    IBOutlet NSTextField *bext_origination_date;
-    IBOutlet NSTextField *bext_origination_time;
-    IBOutlet NSTextField *bext_originator;
-    IBOutlet NSTextField *bext_originator_ref;
-    IBOutlet NSTextField *bext_UMID;
-    IBOutlet NSTextField *bext_version;
-    IBOutlet NSTextField *bext_timecode;
-    IBOutlet NSPopUpButton *bext_timecode_fps;
+    IBOutlet NSTextField *labelFormat;
+    IBOutlet NSTextField *labelSamplerate;
+    IBOutlet NSTextField *labelBytesPerSample;
+    IBOutlet NSTextField *labelChannels;
+    IBOutlet NSTextField *labelFrames;
+    IBOutlet NSTextField *labelLength;
+    IBOutlet NSTextField *labelFilesize;
+    IBOutlet NSTextField *labelBytesPerSecond;
+    IBOutlet NSTextField *labelSampleFormat;
+    IBOutlet NSTextField *labelSections;
+
+    IBOutlet NSTextField *bextCodingHistory;
+    IBOutlet NSTextField *bextDescription;
+    IBOutlet NSTextField *bextOriginationDate;
+    IBOutlet NSTextField *bextOriginationTime;
+    IBOutlet NSTextField *bextOriginator;
+    IBOutlet NSTextField *bextOriginatorRef;
+    IBOutlet NSTextField *bextUMID;
+    IBOutlet NSTextField *bextVersion;
+    IBOutlet NSTextField *bextTimecode;
     
-    IBOutlet NSButton *play_button;
-    IBOutlet NSPopUpButton *left_channel;
-    IBOutlet NSPopUpButton *right_channel;
-    IBOutlet NSSlider *play_slider;
-    IBOutlet NSTextField *play_pos;
+    IBOutlet NSPopUpButton *convertFormat;
+    IBOutlet NSPopUpButton *convertSubformat;
+    IBOutlet NSTableView *convertTable;
+    IBOutlet NSWindow *convertSheet;
+    IBOutlet NSProgressIndicator *convertProgress;
+    IBOutlet NSButton *convertKeepBEXT;
+    
+    IBOutlet NSButton *playButton;
+    IBOutlet NSPopUpButton *leftChannel;
+    IBOutlet NSPopUpButton *rightChannel;
+    IBOutlet NSSlider *playSlider;
+    IBOutlet NSTextField *playPos;
 }
 
 - (IBAction) play : (id) sender;
-- (IBAction) bext_update_timecode: (id) sender;
-- (IBAction) bext_update_timecode_fps: (id) sender;
+- (IBAction) bextUpdateTimecode: (id) sender;
+- (IBAction) bextUpdateTimecode_fps: (id) sender;
+- (IBAction) convertFormatSelected: (id) sender;
+- (IBAction) convert: (id) sender;
+- (IBAction) convertCancel: (id) sender;
+- (IBAction) playSliderMoved: (id) sender;
+- (IBAction) setString: (id) sender;
+- (IBAction) setOutputMapping: (id) sender;
+
 
 @end

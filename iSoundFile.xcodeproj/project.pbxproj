@@ -13,6 +13,7 @@
 		8BBF9EB30C9412C900CAA4F1 /* libsndfile.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BBF9EB20C9412C900CAA4F1 /* libsndfile.1.dylib */; };
 		8BBF9EB40C9412CE00CAA4F1 /* libsndfile.1.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 8BBF9EB20C9412C900CAA4F1 /* libsndfile.1.dylib */; };
 		8BBF9F100C944AAC00CAA4F1 /* AudioRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BBF9F0F0C944AAC00CAA4F1 /* AudioRenderer.m */; };
+		8BBFA1B60C9592D300CAA4F1 /* ChannelTableSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BBFA1B50C9592D300CAA4F1 /* ChannelTableSource.m */; };
 		8BD4A5B30C92C60400243C91 /* SoundFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BD4A5B20C92C60400243C91 /* SoundFile.m */; };
 		8BD4A73F0C92E24800243C91 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD4A73E0C92E24800243C91 /* CoreAudio.framework */; };
 		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
@@ -38,6 +39,8 @@
 		8BBF9EB20C9412C900CAA4F1 /* libsndfile.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libsndfile.1.dylib; sourceTree = "<group>"; };
 		8BBF9F0E0C944AAC00CAA4F1 /* AudioRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioRenderer.h; sourceTree = "<group>"; };
 		8BBF9F0F0C944AAC00CAA4F1 /* AudioRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioRenderer.m; sourceTree = "<group>"; };
+		8BBFA1B40C9592D300CAA4F1 /* ChannelTableSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelTableSource.h; sourceTree = "<group>"; };
+		8BBFA1B50C9592D300CAA4F1 /* ChannelTableSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelTableSource.m; sourceTree = "<group>"; };
 		8BD4A5B10C92C60400243C91 /* SoundFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SoundFile.h; sourceTree = "<group>"; };
 		8BD4A5B20C92C60400243C91 /* SoundFile.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SoundFile.m; sourceTree = "<group>"; };
 		8BD4A73E0C92E24800243C91 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
@@ -97,8 +100,6 @@
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
-				8BBF9F0E0C944AAC00CAA4F1 /* AudioRenderer.h */,
-				8BBF9F0F0C944AAC00CAA4F1 /* AudioRenderer.m */,
 			);
 			name = iSoundFile;
 			sourceTree = "<group>";
@@ -106,6 +107,10 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				8BBF9F0E0C944AAC00CAA4F1 /* AudioRenderer.h */,
+				8BBF9F0F0C944AAC00CAA4F1 /* AudioRenderer.m */,
+				8BBFA1B40C9592D300CAA4F1 /* ChannelTableSource.h */,
+				8BBFA1B50C9592D300CAA4F1 /* ChannelTableSource.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -203,6 +208,7 @@
 				8D15AC320486D014006FF6A4 /* main.m in Sources */,
 				8BD4A5B30C92C60400243C91 /* SoundFile.m in Sources */,
 				8BBF9F100C944AAC00CAA4F1 /* AudioRenderer.m in Sources */,
+				8BBFA1B60C9592D300CAA4F1 /* ChannelTableSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
