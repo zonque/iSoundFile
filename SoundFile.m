@@ -1,4 +1,6 @@
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #import <CoreAudio/CoreAudio.h>
 #import <CoreAudio/CoreAudioTypes.h>
@@ -38,15 +40,79 @@
     }
 
     [label_format setStringValue: [NSString stringWithCString: format_info.name]];
+
+    format_info.format = sfinfo.format & SF_FORMAT_SUBMASK;
+    sf_command (sndfile, SFC_GET_FORMAT_INFO, &format_info, sizeof (format_info)) ;
+    [label_sample_format setStringValue: [NSString stringWithCString: format_info.name]];
+
     [label_samplerate setIntValue: sfinfo.samplerate];
     [label_channels setIntValue: sfinfo.channels];
     [label_frames setIntValue: sfinfo.frames];
-    [label_length setStringValue: [NSString stringWithFormat: @"%llu:%02llu:%02llu.%03llu",
-                                    (sfinfo.frames / (sfinfo.samplerate * 60ULL * 60ULL)),
-                                    (sfinfo.frames / (sfinfo.samplerate * 60ULL)) % 60ULL,
-                                    (sfinfo.frames / sfinfo.samplerate) % 60ULL,
-                                    ((sfinfo.frames % sfinfo.samplerate) * 1000ULL) / sfinfo.samplerate ]];
+    [label_sections setIntValue: sfinfo.sections];
 
+    char str[128];
+    int seconds = sfinfo.frames / sfinfo.samplerate ;
+
+    snprintf (str, sizeof (str) - 1, "%02d:", seconds / 60 / 60) ;
+    
+    seconds = seconds % (60 * 60) ;
+    snprintf (str + strlen (str), sizeof (str) - strlen (str) - 1, "%02d:", seconds / 60) ;
+
+    seconds = seconds % 60 ;
+    snprintf (str + strlen (str), sizeof (str) - strlen (str) - 1, "%02d.", seconds) ;
+
+    seconds = ((1000 * sfinfo.frames) / sfinfo.samplerate) % 1000 ;
+    snprintf (str + strlen (str), sizeof (str) - strlen (str) - 1, "%03d", seconds) ;
+    
+    [label_length setStringValue: [NSString stringWithCString: str]];
+
+    off_t filesize = file_stat.st_size;
+    char pot[] = " KMGT", *c = pot;
+    while (filesize > 1024ULL) {
+        filesize /= 1024ULL;
+        c++;
+    }
+    
+    snprintf(str, sizeof(str)-1, "%llu %c%s", filesize, *c, (*c == ' ') ? "ytes" : "");
+    [label_filesize setStringValue: [NSString stringWithCString: str]];
+
+    int bit_depth = -1;
+
+    switch(sfinfo.format & SF_FORMAT_SUBMASK) {
+        case SF_FORMAT_PCM_S8:
+        case SF_FORMAT_PCM_U8:
+        case SF_FORMAT_DPCM_8:
+            bit_depth = 8;
+            break;
+        case SF_FORMAT_DWVW_12:
+            bit_depth = 12;
+            break;
+        case SF_FORMAT_PCM_16:
+        case SF_FORMAT_DWVW_16:
+        case SF_FORMAT_DPCM_16:
+            bit_depth = 16;
+            break;
+        case SF_FORMAT_PCM_24:
+        case SF_FORMAT_DWVW_24:
+            bit_depth = 24;
+            break;
+        case SF_FORMAT_PCM_32:
+        case SF_FORMAT_FLOAT:
+            bit_depth = 32;
+            break;
+        case SF_FORMAT_DOUBLE:
+            bit_depth = 64;
+            break;
+    }
+    
+    if (bit_depth > 0) {
+        [label_bytes_per_sample setIntValue: bit_depth / 8];
+        [label_bytes_per_second setIntValue: (bit_depth / 8) * sfinfo.samplerate * sfinfo.channels];
+    } else {
+        [label_bytes_per_sample setStringValue: @"unknown"];
+        [label_bytes_per_second setStringValue: @"unknown"];
+    }
+    
     if (read_only) {
         [string_title setEnabled: NO];
         [string_copyright setEnabled: NO];
@@ -80,6 +146,31 @@
     if (tmp)
         [string_date        setStringValue: [NSString stringWithCString: tmp]];
 
+    BOOL got_bext = sf_command (sndfile, SFC_GET_BROADCAST_INFO, &bext, sizeof (bext));
+    if (got_bext) {
+        [bext_version           setIntValue: bext.version];
+        [bext_description       setStringValue: [NSString stringWithCString: bext.description]];
+        [bext_originator        setStringValue: [NSString stringWithCString: bext.originator]];
+        [bext_originator_ref    setStringValue: [NSString stringWithCString: bext.originator_reference]];
+        [bext_origination_date  setStringValue: [NSString stringWithCString: bext.origination_date]];
+        [bext_origination_time  setStringValue: [NSString stringWithCString: bext.origination_time]];
+        [bext_UMID              setStringValue: [NSString stringWithCString: bext.umid]];
+        [bext_coding_history    setStringValue: [NSString stringWithCString: bext.coding_history]];
+        [self bext_update_timecode_fps: bext_timecode_fps];
+    } else {
+        [bext_version setEnabled: FALSE];
+        [bext_description setEnabled: FALSE];
+        [bext_originator setEnabled: FALSE];
+        [bext_originator_ref setEnabled: FALSE];
+        [bext_origination_date setEnabled: FALSE];
+        [bext_origination_time setEnabled: FALSE];
+        [bext_UMID setEnabled: FALSE];
+        [bext_coding_history setEnabled: FALSE];
+        [bext_timecode setEnabled: FALSE];
+        [bext_timecode_fps setEnabled: FALSE];
+    }
+
+   
     [play_slider setMaxValue: sfinfo.frames];
     [left_channel removeAllItems];
     [right_channel removeAllItems];
@@ -92,7 +183,7 @@
     
     if (sfinfo.channels > 1)
         [right_channel selectItemAtIndex: 1];
-        
+
     audioRenderer = [[AudioRenderer alloc] init];
     [audioRenderer set_sndfile: sndfile : &sfinfo];
 
@@ -106,7 +197,6 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self
 		selector:@selector(eof:)
 		name:@"EOF" object:audioRenderer];
-
 }
 
 - (BOOL)readFromURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
@@ -118,18 +208,8 @@
 
     fname = strdup([[absoluteURL path] cString]);
 
-    if (access(fname, R_OK | W_OK) == 0)
-        read_only = NO;
-    else if (access(fname, R_OK) == 0)
-        read_only = YES;
-    else {
-        printf("permission denied.\n");
-        *outError = [NSError errorWithDomain: NSPOSIXErrorDomain code:EPERM userInfo: nil];
-        return NO;
-    }
-
     bzero(&sfinfo, sizeof(sfinfo));
-    sndfile = sf_open(fname, read_only ? SFM_READ : SFM_RDWR, &sfinfo);
+    sndfile = sf_open(fname, SFM_READ, &sfinfo);
     
     if (!sndfile) {
         char err[0x100];
@@ -142,6 +222,8 @@
 
         return NO;
     }
+    
+    stat(fname, &file_stat);
     
     return YES;
 }
@@ -218,9 +300,6 @@
 
 - (IBAction)set_string:(id)sender
 {
-    if (read_only)
-        return;
-
     modified = YES;
 }
 
@@ -273,6 +352,62 @@
         [play_button setTitle: @"play"];
     }
 }
+
+- (int) getTimecodeSPF
+{
+    int spf = -1;
+    
+    switch ([bext_timecode_fps indexOfSelectedItem]) {
+        case 0: /* 25 fps */
+            spf = sfinfo.samplerate / 25;
+            break;
+        case 1: /* 24 fps */
+            spf = sfinfo.samplerate / 24;
+            break;
+    }
+
+    return spf;
+}
+
+- (IBAction) bext_update_timecode_fps: (id) sender
+{
+    UInt64 tc, s, f;
+        
+    tc = bext.time_reference_high;
+    tc <<= 32;
+    tc |= bext.time_reference_low;
+    
+    s = tc / sfinfo.samplerate;
+    f = tc % sfinfo.samplerate;
+    [bext_timecode setStringValue: [NSString stringWithFormat: @"%03llu:%02llu:%02llu:%llu", s/3600, (s/60) % 60, s % 60, f]];
+}
+
+- (IBAction) bext_update_timecode: (id) sender
+{
+    char tmp[0x100], *sh, *sm, *ss, *ssamp;
+    int h, m, s, samp;
+
+    [[sender stringValue] getCString: tmp maxLength: sizeof(tmp) encoding: NSASCIIStringEncoding];
+    sh = strtok(tmp, ":");
+    sm = strtok(NULL, ":");
+    ss = strtok(NULL, ":");
+    ssamp = strtok(NULL, ":");
+    
+    if (!sh || !sm || !ss || !ssamp)
+        return;
+
+    h = strtol(sh, NULL, 0);
+    m = strtol(sm, NULL, 0);
+    s = strtol(ss, NULL, 0);
+    samp = strtol(ssamp, NULL, 0);
+
+    s += (h * 3600 + m * 60);
+
+    UInt64 tc = (UInt64) s * (UInt64) sfinfo.samplerate + (UInt64) samp;
+    bext.time_reference_low = tc & 0xffffffff;
+    bext.time_reference_high = tc >> 32;
+}
+
 
 - (IBAction) setOutputMapping: (id) sender
 {

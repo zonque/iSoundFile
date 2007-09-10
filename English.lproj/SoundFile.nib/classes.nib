@@ -3,6 +3,8 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {
+                "bext_update_timecode" = id; 
+                "bext_update_timecode_fps" = id; 
                 play = id; 
                 "play_slider_moved" = id; 
                 setOutputMapping = id; 
@@ -11,12 +13,25 @@
             CLASS = SoundFile; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                "label_bitdepth" = NSTextField; 
+                "bext_UMID" = NSTextField; 
+                "bext_coding_history" = NSTextField; 
+                "bext_description" = NSTextField; 
+                "bext_origination_date" = NSTextField; 
+                "bext_origination_time" = NSTextField; 
+                "bext_originator" = NSTextField; 
+                "bext_originator_ref" = NSTextField; 
+                "bext_timecode" = NSTextField; 
+                "bext_version" = NSTextField; 
+                "label_bytes_per_sample" = NSTextField; 
+                "label_bytes_per_second" = NSTextField; 
                 "label_channels" = NSTextField; 
+                "label_filesize" = NSTextField; 
                 "label_format" = NSTextField; 
                 "label_frames" = NSTextField; 
                 "label_length" = NSTextField; 
+                "label_sample_format" = NSTextField; 
                 "label_samplerate" = NSTextField; 
+                "label_sections" = NSTextField; 
                 "left_channel" = NSPopUpButton; 
                 "play_button" = NSButton; 
                 "play_pos" = NSTextField; 

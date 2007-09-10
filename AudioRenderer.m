@@ -27,11 +27,11 @@
         
     *buf = file_buffer + current_buffer_start;
   
-    if (buffer_vpos + (num * sfinfo.channels) > sfinfo.frames)
-        num -= (buffer_vpos + (num * sfinfo.channels)) - sfinfo.frames;
+    if (buffer_vpos + num > sfinfo.frames)
+        num -= (buffer_vpos + num) - sfinfo.frames;
     
     current_buffer_start += num;
-    buffer_vpos += num;
+    buffer_vpos += num / sfinfo.channels;
     return num;
 }
 
@@ -64,7 +64,6 @@ static OSStatus sf_coreaudio_render_proc (void *this,
         frames_read += r / ar->sfinfo.channels;
         float *p = buf;
 
-//        
         [[NSNotificationCenter defaultCenter]
                 postNotificationName:@"filePositionChanged" object:ar];
 
@@ -97,7 +96,7 @@ static OSStatus sf_coreaudio_render_proc (void *this,
         AudioUnit converter_unit;
 
         sndfile = s;
-        memcpy(&sfinfo, info, sizeof(*info));
+        memcpy(&sfinfo, info, sizeof(sfinfo));
         
         /* find an audio output unit */
         desc.componentType = kAudioUnitType_Output;
@@ -209,7 +208,6 @@ static OSStatus sf_coreaudio_render_proc (void *this,
 - (void) setRightOutputMapping: (int) channel
 {
     rightMapping = channel;
-    printf("left: %d right: %d\n", leftMapping, rightMapping);
 }
 
 - (void) dealloc
