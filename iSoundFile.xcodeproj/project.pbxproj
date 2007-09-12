@@ -11,6 +11,8 @@
 		8B20E94F0C9829B5009EE4ED /* libFLAC.8.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 8B20E9470C98299C009EE4ED /* libFLAC.8.dylib */; };
 		8B20E97F0C982E3E009EE4ED /* SoundFileWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B20E97E0C982E3E009EE4ED /* SoundFileWindowController.m */; };
 		8B20EB810C985114009EE4ED /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 8B20EB7F0C985114009EE4ED /* Credits.rtf */; };
+		8B20EB9D0C985D39009EE4ED /* libogg.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B20EB9C0C985D39009EE4ED /* libogg.0.dylib */; };
+		8B20EBA20C985D75009EE4ED /* libogg.0.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 8B20EB9C0C985D39009EE4ED /* libogg.0.dylib */; };
 		8B310CF80C92BCE10089FE97 /* SoundFile.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8B310CF60C92BCE10089FE97 /* SoundFile.nib */; };
 		8BBF9E510C9323C900CAA4F1 /* isoundfile.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BBF9E500C9323C900CAA4F1 /* isoundfile.icns */; };
 		8BBF9EA40C940E3E00CAA4F1 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BBF9EA30C940E3E00CAA4F1 /* AudioUnit.framework */; };
@@ -39,6 +41,7 @@
 		8B20E97D0C982E3E009EE4ED /* SoundFileWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SoundFileWindowController.h; sourceTree = "<group>"; };
 		8B20E97E0C982E3E009EE4ED /* SoundFileWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SoundFileWindowController.m; sourceTree = "<group>"; };
 		8B20EB800C985114009EE4ED /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
+		8B20EB9C0C985D39009EE4ED /* libogg.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libogg.0.dylib; sourceTree = "<group>"; };
 		8B310CF70C92BCE10089FE97 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/SoundFile.nib; sourceTree = "<group>"; };
 		8BBF9E500C9323C900CAA4F1 /* isoundfile.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = isoundfile.icns; sourceTree = "<group>"; };
 		8BBF9EA30C940E3E00CAA4F1 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
@@ -64,6 +67,7 @@
 				8BBF9EA40C940E3E00CAA4F1 /* AudioUnit.framework in Frameworks */,
 				8BBF9EB30C9412C900CAA4F1 /* libsndfile.1.dylib in Frameworks */,
 				8B20E9480C98299C009EE4ED /* libFLAC.8.dylib in Frameworks */,
+				8B20EB9D0C985D39009EE4ED /* libogg.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +103,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* iSoundFile */ = {
 			isa = PBXGroup;
 			children = (
+				8B20EB9C0C985D39009EE4ED /* libogg.0.dylib */,
 				8B20EB7F0C985114009EE4ED /* Credits.rtf */,
 				8B20E97D0C982E3E009EE4ED /* SoundFileWindowController.h */,
 				8B20E97E0C982E3E009EE4ED /* SoundFileWindowController.m */,
@@ -199,6 +204,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B20EBA20C985D75009EE4ED /* libogg.0.dylib in Resources */,
 				8B20E94F0C9829B5009EE4ED /* libFLAC.8.dylib in Resources */,
 				8BBF9EB40C9412CE00CAA4F1 /* libsndfile.1.dylib in Resources */,
 				8D15AC2D0486D014006FF6A4 /* MainMenu.nib in Resources */,

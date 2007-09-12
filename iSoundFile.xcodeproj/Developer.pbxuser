@@ -371,6 +371,16 @@
 			8B20EB990C9851C6009EE4ED /* PBXTextBookmark */ = 8B20EB990C9851C6009EE4ED /* PBXTextBookmark */;
 			8B20EB9A0C9851C6009EE4ED /* PBXTextBookmark */ = 8B20EB9A0C9851C6009EE4ED /* PBXTextBookmark */;
 			8B20EB9B0C9851C6009EE4ED /* PBXTextBookmark */ = 8B20EB9B0C9851C6009EE4ED /* PBXTextBookmark */;
+			8B20EBA60C985D82009EE4ED /* PBXTextBookmark */ = 8B20EBA60C985D82009EE4ED /* PBXTextBookmark */;
+			8B20EBA70C985D82009EE4ED /* PBXTextBookmark */ = 8B20EBA70C985D82009EE4ED /* PBXTextBookmark */;
+			8B20EBA80C985D82009EE4ED /* PBXTextBookmark */ = 8B20EBA80C985D82009EE4ED /* PBXTextBookmark */;
+			8B20EBA90C985D82009EE4ED /* PBXTextBookmark */ = 8B20EBA90C985D82009EE4ED /* PBXTextBookmark */;
+			8B20EBAA0C985D82009EE4ED /* PBXTextBookmark */ = 8B20EBAA0C985D82009EE4ED /* PBXTextBookmark */;
+			8B20EBAF0C985E2F009EE4ED /* PBXTextBookmark */ = 8B20EBAF0C985E2F009EE4ED /* PBXTextBookmark */;
+			8B20EBB00C985E2F009EE4ED /* PBXTextBookmark */ = 8B20EBB00C985E2F009EE4ED /* PBXTextBookmark */;
+			8B20EBB10C985E2F009EE4ED /* PBXTextBookmark */ = 8B20EBB10C985E2F009EE4ED /* PBXTextBookmark */;
+			8B20EBB20C985E2F009EE4ED /* PBXTextBookmark */ = 8B20EBB20C985E2F009EE4ED /* PBXTextBookmark */;
+			8B20EBB30C985E2F009EE4ED /* PBXTextBookmark */ = 8B20EBB30C985E2F009EE4ED /* PBXTextBookmark */;
 			8BBF9D360C93041D00CAA4F1 = 8BBF9D360C93041D00CAA4F1 /* PBXTextBookmark */;
 			8BBF9D370C93041D00CAA4F1 = 8BBF9D370C93041D00CAA4F1 /* PBXTextBookmark */;
 			8BBF9D4C0C93055B00CAA4F1 = 8BBF9D4C0C93055B00CAA4F1 /* PBXTextBookmark */;
@@ -3258,6 +3268,106 @@
 		vrLoc = 46;
 	};
 	8B20EB9B0C9851C6009EE4ED /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8BBF9F0F0C944AAC00CAA4F1 /* AudioRenderer.m */;
+		name = num;
+		rLen = 3;
+		rLoc = 469;
+		rType = 0;
+		vrLen = 1714;
+		vrLoc = 392;
+	};
+	8B20EBA60C985D82009EE4ED /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8B20E97E0C982E3E009EE4ED /* SoundFileWindowController.m */;
+		name = "SoundFileWindowController.m: applicationShouldOpenUntitledFile:";
+		rLen = 0;
+		rLoc = 82;
+		rType = 0;
+		vrLen = 174;
+		vrLoc = 0;
+	};
+	8B20EBA70C985D82009EE4ED /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8B20EB800C985114009EE4ED /* English */;
+		name = "Icon design:";
+		rLen = 12;
+		rLoc = 206;
+		rType = 0;
+		vrLen = 235;
+		vrLoc = 0;
+	};
+	8B20EBA80C985D82009EE4ED /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8BD4A5B10C92C60400243C91 /* SoundFile.h */;
+		name = "SoundFile.h: convertTableSource";
+		rLen = 0;
+		rLoc = 382;
+		rType = 0;
+		vrLen = 1539;
+		vrLoc = 0;
+	};
+	8B20EBA90C985D82009EE4ED /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8BBFA1B50C9592D300CAA4F1 /* ChannelTableSource.m */;
+		name = channelIsSelected;
+		rLen = 17;
+		rLoc = 1045;
+		rType = 0;
+		vrLen = 1069;
+		vrLoc = 46;
+	};
+	8B20EBAA0C985D82009EE4ED /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8BBF9F0F0C944AAC00CAA4F1 /* AudioRenderer.m */;
+		name = num;
+		rLen = 3;
+		rLoc = 469;
+		rType = 0;
+		vrLen = 1714;
+		vrLoc = 392;
+	};
+	8B20EBAF0C985E2F009EE4ED /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8B20E97E0C982E3E009EE4ED /* SoundFileWindowController.m */;
+		name = "SoundFileWindowController.m: applicationShouldOpenUntitledFile:";
+		rLen = 0;
+		rLoc = 82;
+		rType = 0;
+		vrLen = 174;
+		vrLoc = 0;
+	};
+	8B20EBB00C985E2F009EE4ED /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8B20EB800C985114009EE4ED /* English */;
+		name = "Icon design:";
+		rLen = 12;
+		rLoc = 206;
+		rType = 0;
+		vrLen = 235;
+		vrLoc = 0;
+	};
+	8B20EBB10C985E2F009EE4ED /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8BD4A5B10C92C60400243C91 /* SoundFile.h */;
+		name = "SoundFile.h: convertTableSource";
+		rLen = 0;
+		rLoc = 382;
+		rType = 0;
+		vrLen = 1539;
+		vrLoc = 0;
+	};
+	8B20EBB20C985E2F009EE4ED /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8BBFA1B50C9592D300CAA4F1 /* ChannelTableSource.m */;
+		name = channelIsSelected;
+		rLen = 17;
+		rLoc = 1045;
+		rType = 0;
+		vrLen = 1069;
+		vrLoc = 46;
+	};
+	8B20EBB30C985E2F009EE4ED /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = 8BBF9F0F0C944AAC00CAA4F1 /* AudioRenderer.m */;
 		name = num;

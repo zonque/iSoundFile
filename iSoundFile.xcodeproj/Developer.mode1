@@ -204,7 +204,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>8B20EB970C9851C6009EE4ED</string>
+						<string>8B20EBAF0C985E2F009EE4ED</string>
 						<key>history</key>
 						<array>
 							<string>8B20E9C40C98309A009EE4ED</string>
@@ -252,7 +252,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>8B20EB980C9851C6009EE4ED</string>
+						<string>8B20EBB00C985E2F009EE4ED</string>
 						<key>history</key>
 						<array>
 							<string>8B20EB830C985123009EE4ED</string>
@@ -292,7 +292,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>8B20EB990C9851C6009EE4ED</string>
+						<string>8B20EBB10C985E2F009EE4ED</string>
 						<key>history</key>
 						<array>
 							<string>8BBF9E790C9326E300CAA4F1</string>
@@ -369,7 +369,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>8B20EB9A0C9851C6009EE4ED</string>
+						<string>8B20EBB20C985E2F009EE4ED</string>
 						<key>history</key>
 						<array>
 							<string>8BBFA2F00C95A35600CAA4F1</string>
@@ -415,7 +415,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>8B20EB9B0C9851C6009EE4ED</string>
+						<string>8B20EBB30C985E2F009EE4ED</string>
 						<key>history</key>
 						<array>
 							<string>8BBF9FAE0C94520100CAA4F1</string>
@@ -520,6 +520,7 @@
 								<string>2A37F4C3FDCFA73011CA2CEA</string>
 								<string>1058C7A6FEA54F5311CA2CBB</string>
 								<string>1058C7A8FEA54F5311CA2CBB</string>
+								<string>19C28FB0FE9D524F11CA2CBB</string>
 								<string>1C37FBAC04509CD000000102</string>
 								<string>8B20E9400C98298B009EE4ED</string>
 								<string>8B20E95A0C982A8C009EE4ED</string>
@@ -529,11 +530,14 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>0</integer>
+									<integer>37</integer>
+									<integer>36</integer>
+									<integer>35</integer>
+									<integer>34</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {352, 378}}</string>
+							<string>{{0, 428}, {352, 378}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -774,16 +778,16 @@
 		<string>8B20E9CD0C98309A009EE4ED</string>
 		<string>8BD4A6330C92CB6600243C91</string>
 		<string>8B20E9B80C98305E009EE4ED</string>
-		<string>8B310CE40C92BB690089FE97</string>
 		<string>8BBF9F4C0C944DC700CAA4F1</string>
 		<string>8BBFA1C30C9593CB00CAA4F1</string>
 		<string>8B20EB060C984A42009EE4ED</string>
 		<string>1CD10A99069EF8BA00B06720</string>
 		<string>8BD4A5B90C92C63A00243C91</string>
 		<string>8B20EB8C0C985197009EE4ED</string>
-		<string>1C0AD2B3069F1EA900FABCE6</string>
-		<string>/Users/Developer/Caiaq/svn.caiaq.de/Software/iSoundFile/iSoundFile.xcodeproj</string>
 		<string>8B20E98F0C982FDD009EE4ED</string>
+		<string>/Users/Developer/Caiaq/svn.caiaq.de/Software/iSoundFile/iSoundFile.xcodeproj</string>
+		<string>8B310CE40C92BB690089FE97</string>
+		<string>1C0AD2B3069F1EA900FABCE6</string>
 	</array>
 	<key>WindowString</key>
 	<string>-4 441 1001 437 0 0 1440 878 </string>
@@ -802,8 +806,6 @@
 					<key>Dock</key>
 					<array>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -826,6 +828,8 @@
 							<string>326pt</string>
 						</dict>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -876,7 +880,7 @@
 			<key>WindowToolGUID</key>
 			<string>8B310CE40C92BB690089FE97</string>
 			<key>WindowToolIsVisible</key>
-			<false/>
+			<true/>
 		</dict>
 		<dict>
 			<key>FirstTimeWindowDisplayed</key>
