@@ -16,9 +16,10 @@
     struct stat file_stat;
     NSURL *url;
     int convertFormats[0x100];
-        ChannelTableSource *convertTableSource;
+    ChannelTableSource *convertTableSource;
 
     IBOutlet NSWindow *window;
+    IBOutlet NSTabView *tabView;
 
     IBOutlet NSTextField *stringArtist;
     IBOutlet NSTextField *stringComment;
@@ -64,13 +65,16 @@
 
 - (IBAction) play : (id) sender;
 - (IBAction) bextUpdateTimecode: (id) sender;
-- (IBAction) bextUpdateTimecode_fps: (id) sender;
+- (IBAction) bextUpdateTimecodeFromFile;
 - (IBAction) convertFormatSelected: (id) sender;
 - (IBAction) convert: (id) sender;
 - (IBAction) convertCancel: (id) sender;
 - (IBAction) playSliderMoved: (id) sender;
-- (IBAction) setString: (id) sender;
 - (IBAction) setOutputMapping: (id) sender;
+- (BOOL) convertToURL: (NSURL *) newURL calledFromConvert: (BOOL) calledFromConvert;
+
+// delegates
+- (void)controlTextDidChange:(NSNotification *)aNotification;
 
 
 @end

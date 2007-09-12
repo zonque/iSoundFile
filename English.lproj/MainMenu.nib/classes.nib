@@ -2,6 +2,12 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
+            CLASS = SoundFileDocumentController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSDocumentController; 
+        }, 
+        {
+            ACTIONS = {openAboutPanel = id; }; 
             CLASS = SoundFileWindowController; 
             LANGUAGE = ObjC; 
             SUPERCLASS = NSWindowController; 

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B20E9480C98299C009EE4ED /* libFLAC.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B20E9470C98299C009EE4ED /* libFLAC.8.dylib */; };
+		8B20E94F0C9829B5009EE4ED /* libFLAC.8.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 8B20E9470C98299C009EE4ED /* libFLAC.8.dylib */; };
+		8B20E97F0C982E3E009EE4ED /* SoundFileWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B20E97E0C982E3E009EE4ED /* SoundFileWindowController.m */; };
+		8B20EB810C985114009EE4ED /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 8B20EB7F0C985114009EE4ED /* Credits.rtf */; };
 		8B310CF80C92BCE10089FE97 /* SoundFile.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8B310CF60C92BCE10089FE97 /* SoundFile.nib */; };
 		8BBF9E510C9323C900CAA4F1 /* isoundfile.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BBF9E500C9323C900CAA4F1 /* isoundfile.icns */; };
 		8BBF9EA40C940E3E00CAA4F1 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BBF9EA30C940E3E00CAA4F1 /* AudioUnit.framework */; };
@@ -16,7 +20,6 @@
 		8BBFA1B60C9592D300CAA4F1 /* ChannelTableSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BBFA1B50C9592D300CAA4F1 /* ChannelTableSource.m */; };
 		8BD4A5B30C92C60400243C91 /* SoundFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BD4A5B20C92C60400243C91 /* SoundFile.m */; };
 		8BD4A73F0C92E24800243C91 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD4A73E0C92E24800243C91 /* CoreAudio.framework */; };
-		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
 		8D15AC2D0486D014006FF6A4 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -29,10 +32,13 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		2A37F4B7FDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		2A37F4BAFDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32DBCF750370BD2300C91783 /* iSoundFile_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iSoundFile_Prefix.pch; sourceTree = "<group>"; };
+		8B20E9470C98299C009EE4ED /* libFLAC.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libFLAC.8.dylib; sourceTree = "<group>"; };
+		8B20E97D0C982E3E009EE4ED /* SoundFileWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SoundFileWindowController.h; sourceTree = "<group>"; };
+		8B20E97E0C982E3E009EE4ED /* SoundFileWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SoundFileWindowController.m; sourceTree = "<group>"; };
+		8B20EB800C985114009EE4ED /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
 		8B310CF70C92BCE10089FE97 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/SoundFile.nib; sourceTree = "<group>"; };
 		8BBF9E500C9323C900CAA4F1 /* isoundfile.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = isoundfile.icns; sourceTree = "<group>"; };
 		8BBF9EA30C940E3E00CAA4F1 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
@@ -57,6 +63,7 @@
 				8BD4A73F0C92E24800243C91 /* CoreAudio.framework in Frameworks */,
 				8BBF9EA40C940E3E00CAA4F1 /* AudioUnit.framework in Frameworks */,
 				8BBF9EB30C9412C900CAA4F1 /* libsndfile.1.dylib in Frameworks */,
+				8B20E9480C98299C009EE4ED /* libFLAC.8.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,7 +99,9 @@
 		2A37F4AAFDCFA73011CA2CEA /* iSoundFile */ = {
 			isa = PBXGroup;
 			children = (
-				8BBF9EB20C9412C900CAA4F1 /* libsndfile.1.dylib */,
+				8B20EB7F0C985114009EE4ED /* Credits.rtf */,
+				8B20E97D0C982E3E009EE4ED /* SoundFileWindowController.h */,
+				8B20E97E0C982E3E009EE4ED /* SoundFileWindowController.m */,
 				8BBF9EA30C940E3E00CAA4F1 /* AudioUnit.framework */,
 				8BD4A73E0C92E24800243C91 /* CoreAudio.framework */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
@@ -129,8 +138,9 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8BBF9EB20C9412C900CAA4F1 /* libsndfile.1.dylib */,
+				8B20E9470C98299C009EE4ED /* libFLAC.8.dylib */,
 				8BBF9E500C9323C900CAA4F1 /* isoundfile.icns */,
-				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */,
 				8D15AC360486D014006FF6A4 /* Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
@@ -189,12 +199,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B20E94F0C9829B5009EE4ED /* libFLAC.8.dylib in Resources */,
 				8BBF9EB40C9412CE00CAA4F1 /* libsndfile.1.dylib in Resources */,
-				8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */,
 				8D15AC2D0486D014006FF6A4 /* MainMenu.nib in Resources */,
 				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
 				8B310CF80C92BCE10089FE97 /* SoundFile.nib in Resources */,
 				8BBF9E510C9323C900CAA4F1 /* isoundfile.icns in Resources */,
+				8B20EB810C985114009EE4ED /* Credits.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +220,7 @@
 				8BD4A5B30C92C60400243C91 /* SoundFile.m in Sources */,
 				8BBF9F100C944AAC00CAA4F1 /* AudioRenderer.m in Sources */,
 				8BBFA1B60C9592D300CAA4F1 /* ChannelTableSource.m in Sources */,
+				8B20E97F0C982E3E009EE4ED /* SoundFileWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,10 +243,10 @@
 			name = MainMenu.nib;
 			sourceTree = "<group>";
 		};
-		2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */ = {
+		8B20EB7F0C985114009EE4ED /* Credits.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
-				2A37F4BAFDCFA73011CA2CEA /* English */,
+				8B20EB800C985114009EE4ED /* English */,
 			);
 			name = Credits.rtf;
 			sourceTree = "<group>";
@@ -264,9 +276,11 @@
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)\"";
 				PRODUCT_NAME = iSoundFile;
 				USER_HEADER_SEARCH_PATHS = "~/src/libsndfile-1.0.17/src/";
 				WRAPPER_EXTENSION = app;
@@ -289,9 +303,11 @@
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)\"";
 				PRODUCT_NAME = iSoundFile;
 				USER_HEADER_SEARCH_PATHS = "~/src/libsndfile-1.0.17/src/";
 				WRAPPER_EXTENSION = app;

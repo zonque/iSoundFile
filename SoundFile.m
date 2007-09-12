@@ -24,6 +24,24 @@
     return @"SoundFile";
 }
 
+- (IBAction)openAboutPanel:(id)sender
+{
+    NSDictionary *options;
+    NSImage *img;
+
+    img = [NSImage imageNamed: @"Picture 1"];
+    options = [NSDictionary dictionaryWithObjectsAndKeys:
+          @"1.1", @"Version",
+          @"Super App", @"ApplicationName",
+          img, @"ApplicationIcon",
+          @"Copyright 2005-2006, My Great Company", @"Copyright",
+          @"Super App v1.1", @"ApplicationVersion",
+          nil];
+
+    [[NSApplication sharedApplication] orderFrontStandardAboutPanelWithOptions:options];
+}
+
+
 - (void)initFromSndFile
 {
     const char *tmp;
@@ -31,11 +49,6 @@
     SF_FORMAT_INFO	format_info;
     format_info.format = sfinfo.format;
     sf_command (sndfile, SFC_GET_FORMAT_INFO, &format_info, sizeof (format_info)) ;
-
-    if (format_info.name == NULL) {
-        [self close];
-        return;
-    }
 
     [labelFormat setStringValue: [NSString stringWithCString: format_info.name]];
 
@@ -118,6 +131,18 @@
         [stringDate setEnabled: NO];
     }
 
+    int format = sfinfo.format & SF_FORMAT_TYPEMASK;
+
+    /* test whether this file format can handle strings at all */
+    if (format != SF_FORMAT_WAV && 
+        format != SF_FORMAT_WAVEX &&
+        format != SF_FORMAT_AIFF &&
+        format != SF_FORMAT_FLAC &&
+        format != SF_FORMAT_CAF) {
+        NSTabViewItem *tab = [tabView tabViewItemAtIndex: [tabView indexOfTabViewItemWithIdentifier: @"Strings"]];
+        [tabView removeTabViewItem: tab];
+    }
+
     tmp = sf_get_string(sndfile, SF_STR_TITLE);
     if (tmp)
         [stringTitle       setStringValue: [NSString stringWithCString: tmp]];
@@ -141,6 +166,11 @@
     tmp = sf_get_string(sndfile, SF_STR_DATE);
     if (tmp)
         [stringDate        setStringValue: [NSString stringWithCString: tmp]];
+    
+    if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX) {
+        NSTabViewItem *tab = [tabView tabViewItemAtIndex: [tabView indexOfTabViewItemWithIdentifier: @"BEXT"]];
+        [tabView removeTabViewItem: tab];
+    }
 
     BOOL got_bext = sf_command (sndfile, SFC_GET_BROADCAST_INFO, &bext, sizeof (bext));
     if (got_bext) {
@@ -155,20 +185,8 @@
         [self bextUpdateTimecodeFromFile];
         [convertKeepBEXT setEnabled: YES];
         [convertKeepBEXT setState: NSOnState];
-    } else {
-        [bextVersion setEnabled: FALSE];
-        [bextDescription setEnabled: FALSE];
-        [bextOriginator setEnabled: FALSE];
-        [bextOriginatorRef setEnabled: FALSE];
-        [bextOriginationDate setEnabled: FALSE];
-        [bextOriginationTime setEnabled: FALSE];
-        [bextUMID setEnabled: FALSE];
-        [bextCodingHistory setEnabled: FALSE];
-        [bextTimecode setEnabled: FALSE];
-        [convertKeepBEXT setEnabled: NO];
-        [convertKeepBEXT setState: NSOffState];
-    }
-
+    } 
+    
     /* Convert tab */
     int major_count, subtype_count, selected_format = 0, m;
     sf_command (NULL, SFC_GET_FORMAT_MAJOR_COUNT, &major_count, sizeof (int)) ;
@@ -256,55 +274,26 @@
     
     url = [absoluteURL copy];
     stat(fname, &file_stat);
+    modified = NO;
     
     return YES;
 }
 
 - (BOOL)saveToURL:(NSURL *)absoluteURL ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation error:(NSError **)outError
 {
+    *outError = nil;
+    
     if (![absoluteURL isFileURL])
         return NO;
     
-    if (read_only)
-        return NO;
-
-    if (saveOperation == NSSaveOperation) {
-        /* normal save, same file */
-        const char *tmp;
-
-        tmp = [[stringTitle stringValue] cString];
-        if (tmp && (strlen(tmp) > 0))
-            sf_set_string(sndfile, SF_STR_TITLE, tmp);
-        
-        tmp = [[stringCopyright stringValue] cString];
-        if (tmp && (strlen(tmp) > 0))
-            sf_set_string(sndfile, SF_STR_COPYRIGHT, tmp);
-        
-        tmp = [[stringSoftware stringValue] cString];
-        if (tmp && (strlen(tmp) > 0))
-            sf_set_string(sndfile, SF_STR_SOFTWARE, tmp);
-        
-        tmp = [[stringArtist stringValue] cString];
-        if (tmp && (strlen(tmp) > 0))
-            sf_set_string(sndfile, SF_STR_ARTIST, tmp);
-        
-        tmp = [[stringComment stringValue] cString];
-        if (tmp && (strlen(tmp) > 0))
-            sf_set_string(sndfile, SF_STR_COMMENT, tmp);
-        
-        tmp = [[stringDate stringValue] cString];
-        if (tmp && (strlen(tmp) > 0))
-            sf_set_string(sndfile, SF_STR_DATE, tmp);
-
-        sf_write_sync(sndfile);
-        sf_command(sndfile, SFC_UPDATE_HEADER_NOW, NULL, 0);
-    } else {
-        /* "save as" - not yes impl. */
-        return NO;
-    }
-
-    modified = NO;
-    return YES; 
+    memcpy(&convertSFInfo, &sfinfo, sizeof(sfinfo));
+    BOOL ret = [self convertToURL: absoluteURL 
+                    calledFromConvert: NO];
+    
+    if (ret)
+        modified = NO;
+    
+    return ret;
 }
 
 - (BOOL)isDocumentEdited
@@ -334,7 +323,7 @@
     [super close];
 }
 
-- (IBAction)setString:(id)sender
+- (void)controlTextDidChange:(NSNotification *)aNotification
 {
     modified = YES;
 }
@@ -424,6 +413,8 @@
     UInt64 tc = (UInt64) s * (UInt64) sfinfo.samplerate + (UInt64) samp;
     bext.time_reference_low = tc & 0xffffffff;
     bext.time_reference_high = tc >> 32;
+    
+    modified = YES;
 }
 
 - (IBAction) convertFormatSelected: (id) sender
@@ -475,16 +466,11 @@
     [sheet release];
 }
 
-- (void)convertFileNameChosen:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+- (BOOL) convertToURL:(NSURL *) newURL calledFromConvert: (BOOL) calledFromConvert
 {
     SNDFILE *outfile;
-    
-    [sheet orderOut:self];
 
-    if (returnCode == 0)
-        return;
-
-    bool isSameFile = [[[sheet URL] path] isEqualToString: [url path]];
+    bool isSameFile = [[newURL path] isEqualToString: [url path]];
 
     char tmpfname[0x100];
     const char *tmp;
@@ -494,7 +480,7 @@
         snprintf(tmpfname, sizeof(tmpfname)-1, "/tmp/isoundfile-%p-%08x", self, [[url path] hash]);
         newName = tmpfname;
     } else
-        newName = [[sheet filename] cString];
+        newName = [[newURL path] cString];
 
     outfile = sf_open(newName, SFM_WRITE, &convertSFInfo);
     if (!outfile) {
@@ -505,7 +491,7 @@
 		[alertSheet setMessageText:@"Unable to write file"];
 		[alertSheet setInformativeText: [NSString stringWithCString: sf_strerror(NULL)]];
 		[alertSheet beginSheetModalForWindow:[self windowForSheet] modalDelegate:self didEndSelector: @selector(sheetReleaser:) contextInfo:nil];
-        return;
+        return NO;
     }
 
     [convertProgress setIndeterminate: NO];
@@ -577,15 +563,35 @@
 
     if (isSameFile) {
         sf_close(sndfile);
-        rename(newName, [[sheet filename] cString]);
+        rename(newName, [[newURL path] cString]);
         bzero(&sfinfo, sizeof(sfinfo));
-        sndfile = sf_open([[sheet filename] cString], SFM_READ, &sfinfo);
+        sndfile = sf_open([[newURL path] cString], SFM_READ, &sfinfo);
         [self initFromSndFile];
+    } else if (calledFromConvert) {
+        NSDocumentController *controller = [NSDocumentController sharedDocumentController];
+        NSError *err;
+        NSDocument *doc = [controller openDocumentWithContentsOfURL: newURL
+                            display: YES
+                            error: &err];
+        [[doc windowForSheet] makeKeyAndOrderFront: self];
     }
 
     [NSApp endModalSession:session];
     [convertSheet orderOut: self];
     [NSApp endSheet:convertSheet returnCode:0];
+    
+    return YES;
+}
+
+- (void)convertFileNameChosen:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+    
+    [sheet orderOut:self];
+
+    if (returnCode == 0)
+        return;
+
+    [self convertToURL: [sheet URL] calledFromConvert: YES];
 }
 
 - (IBAction) convertCancel: (id) sender
@@ -653,6 +659,5 @@
     [playSlider setIntValue: 0];
     [self playSliderMoved: playSlider];
 }
-
 
 @end

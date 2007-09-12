@@ -10,7 +10,6 @@
                 play = id; 
                 playSliderMoved = id; 
                 setOutputMapping = id; 
-                setString = id; 
             }; 
             CLASS = SoundFile; 
             LANGUAGE = ObjC; 
@@ -51,6 +50,7 @@
                 stringDate = NSTextField; 
                 stringSoftware = NSTextField; 
                 stringTitle = NSTextField; 
+                tabView = NSTabView; 
             }; 
             SUPERCLASS = NSDocument; 
         }
