@@ -5,11 +5,10 @@
 @interface SoundFile : NSDocument
 {
     SNDFILE *sndfile;
-    SF_INFO  sfinfo;
-    SF_INFO convertSFInfo;
+    SF_INFO sfinfo, convertSFInfo;
     SF_BROADCAST_INFO bext;
     BOOL read_only, modified;
-    BOOL is_playing;
+    BOOL isPlaying;
     const char *fname;
     NSTimer *timer;
     AudioRenderer *audioRenderer;
@@ -17,6 +16,7 @@
     NSURL *url;
     int convertFormats[0x100];
     ChannelTableSource *convertTableSource;
+    ChannelTableSource *peakTableSource;
 
     IBOutlet NSWindow *window;
     IBOutlet NSTabView *tabView;
@@ -49,6 +49,10 @@
     IBOutlet NSTextField *bextVersion;
     IBOutlet NSTextField *bextTimecode;
     
+    IBOutlet NSTableView *peakTable;
+    IBOutlet NSProgressIndicator *peakProgress;
+    IBOutlet NSTextField *peakNotYet;
+    
     IBOutlet NSPopUpButton *convertFormat;
     IBOutlet NSPopUpButton *convertSubformat;
     IBOutlet NSTableView *convertTable;
@@ -71,6 +75,7 @@
 - (IBAction) convertCancel: (id) sender;
 - (IBAction) playSliderMoved: (id) sender;
 - (IBAction) setOutputMapping: (id) sender;
+- (IBAction) calculatePeak: (id) sender;
 - (BOOL) convertToURL: (NSURL *) newURL calledFromConvert: (BOOL) calledFromConvert;
 
 // delegates

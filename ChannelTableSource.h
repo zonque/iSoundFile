@@ -8,10 +8,19 @@
 
 #import <Cocoa/Cocoa.h>
 
+enum type {
+    CONVERT_TABLE,
+    PEAK_TABLE
+};
+
+#define MAX_CHANNELS 0x100
 
 @interface ChannelTableSource : NSObject {
     int numChannels;
-    bool state[0x100];
+    int type;
+    bool state[MAX_CHANNELS];
+    double peakValue[MAX_CHANNELS];
+    SF_INFO *sfinfo;
 }
 
 - (void)tableView:(NSTableView *)aTableView
@@ -26,5 +35,8 @@
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView;
 - (void) setNumChannels: (int) n;
 - (bool) channelIsSelected: (int) channel;
+- (void) setPeakIfHigher: (double) val channel: (int) chn;
+- (void) setType: (int) t;
+- (void) setSFinfo: (SF_INFO *) info;
 
 @end

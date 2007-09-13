@@ -16,6 +16,7 @@
 
 @implementation SoundFile
 
+#define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 
 - (NSString *)windowNibName
 {
@@ -210,7 +211,13 @@
     convertTableSource = [[ChannelTableSource alloc] init];
     [convertTableSource setNumChannels: sfinfo.channels];
     [convertTable setDataSource: convertTableSource];
-        
+
+    /* Peak */
+    peakTableSource = [[ChannelTableSource alloc] init];
+    [peakTableSource setNumChannels: sfinfo.channels];
+    [peakTableSource setType: PEAK_TABLE];
+    [peakTable setHidden: TRUE];
+
     /* Playback */
     [playSlider setMaxValue: sfinfo.frames];
     [leftChannel removeAllItems];
@@ -264,10 +271,8 @@
         char err[0x100];
         sf_error_str(sndfile, err, sizeof(err));
         printf ("fname = >%s< err = >%s<\n", fname, err);
-//        *outError = [NSError errorWithDomain: @"libsndfileError" code:-1
-//                    userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithCString: err], NSLocalizedDescriptionKey, nil]];
-        *outError = [NSError errorWithDomain:@"fun house errors" code:-10101
-          userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"problems creating image destination for file save", NSLocalizedDescriptionKey, nil]];
+        *outError = [NSError errorWithDomain: @"libsndfileError" code:-1
+                    userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithCString: err], NSLocalizedDescriptionKey, nil]];
 
         return NO;
     }
@@ -352,9 +357,9 @@
 
 - (IBAction)play:(id)sender
 {
-    is_playing ^= 1;
+    isPlaying ^= 1;
 
-    if (is_playing) {
+    if (isPlaying) {
         timer = [NSTimer
             timerWithTimeInterval: .1
             target:self selector:@selector(timerCallback:)
@@ -600,11 +605,6 @@
     [NSApp endSheet:convertSheet returnCode:0];
 }
 
-- (void) convertProgressUpdate
-{
-
-}
-
 - (IBAction) convert: (id) sender
 {
     SF_FORMAT_INFO tmp_format_info;
@@ -651,6 +651,59 @@
                         modalDelegate:self 
                         didEndSelector:@selector(convertSheetDidEnd:returnCode:contextInfo:) 
                         contextInfo:NULL];
+}
+
+- (IBAction) calculatePeak: (id) sender
+{
+    sf_count_t playSave, framesRead = 0;
+    
+    [peakProgress setHidden: FALSE];
+    [peakProgress setIndeterminate: FALSE];
+    [sender setHidden: TRUE];
+    [peakTableSource setSFinfo: &sfinfo];
+
+    BOOL wasPlaying = isPlaying;
+    if (isPlaying) {
+        playSave = [playSlider intValue];
+        [self play: self];
+    }
+
+    NSModalSession session = [NSApp beginModalSessionForWindow:[self windowForSheet]];
+    
+    int save_state = sf_command(sndfile, SFC_GET_NORM_DOUBLE, NULL, 0);
+    sf_command(sndfile, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE);
+    
+    int c, n;
+    sf_seek(sndfile, 0, SEEK_SET);
+
+    double buf[1024];
+    while((n = sf_read_double(sndfile, buf, ARRAY_SIZE(buf)))) {        
+        framesRead += n;
+
+        for (c = 0; c < n; c++) {
+            int chn = c % sfinfo.channels;
+            [peakTableSource setPeakIfHigher: fabs(buf[c]) channel: chn];
+        }
+
+        [peakProgress setDoubleValue: ((double) framesRead * 100) / (double) (sfinfo.frames * sfinfo.channels)];
+        if ([NSApp runModalSession:session] != NSRunContinuesResponse)
+            {}; //break;
+    }
+
+    sf_command(sndfile, SFC_SET_NORM_DOUBLE, NULL, save_state);
+
+    [NSApp endModalSession:session];
+    [peakProgress setHidden: TRUE];
+    [peakNotYet setHidden: TRUE];
+    [peakTable setDataSource: peakTableSource];
+    [peakTable setHidden: FALSE];
+    [peakTable reloadData];
+
+    if (wasPlaying) {
+        [playSlider setIntValue: playSave];
+        [self playSliderMoved: playSlider];
+        [self play: self];
+    }
 }
 
 - (IBAction) eof: (id)sender

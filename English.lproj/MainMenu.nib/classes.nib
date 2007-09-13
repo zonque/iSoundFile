@@ -7,7 +7,7 @@
             SUPERCLASS = NSDocumentController; 
         }, 
         {
-            ACTIONS = {openAboutPanel = id; }; 
+            ACTIONS = {}; 
             CLASS = SoundFileWindowController; 
             LANGUAGE = ObjC; 
             SUPERCLASS = NSWindowController; 

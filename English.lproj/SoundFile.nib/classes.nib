@@ -4,6 +4,7 @@
         {
             ACTIONS = {
                 bextUpdateTimecode = id; 
+                calculatePeak = id; 
                 convert = id; 
                 convertCancel = id; 
                 convertFormatSelected = id; 
@@ -40,6 +41,9 @@
                 labelSamplerate = NSTextField; 
                 labelSections = NSTextField; 
                 leftChannel = NSPopUpButton; 
+                peakNotYet = NSTextField; 
+                peakProgress = NSProgressIndicator; 
+                peakTable = NSTableView; 
                 playButton = NSButton; 
                 playPos = NSTextField; 
                 playSlider = NSSlider; 
