@@ -204,12 +204,12 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>8B9AD2E60C99AB280017B271</string>
+						<string>8B9AD4680C9AE0960017B271</string>
 						<key>history</key>
 						<array>
 							<string>8BBF9E790C9326E300CAA4F1</string>
-							<string>8B9AD22F0C999D010017B271</string>
-							<string>8B9AD2300C999D010017B271</string>
+							<string>8B9AD3050C9AC5FE0017B271</string>
+							<string>8B9AD3060C9AC5FE0017B271</string>
 						</array>
 						<key>prevStack</key>
 						<array>
@@ -220,6 +220,14 @@
 							<string>8B9AD2320C999D010017B271</string>
 							<string>8B9AD2330C999D010017B271</string>
 							<string>8B9AD2340C999D010017B271</string>
+							<string>8B9AD3070C9AC5FE0017B271</string>
+							<string>8B9AD3080C9AC5FE0017B271</string>
+							<string>8B9AD3090C9AC5FE0017B271</string>
+							<string>8B9AD30A0C9AC5FE0017B271</string>
+							<string>8B9AD30B0C9AC5FE0017B271</string>
+							<string>8B9AD30C0C9AC5FE0017B271</string>
+							<string>8B9AD30D0C9AC5FE0017B271</string>
+							<string>8B9AD30E0C9AC5FE0017B271</string>
 						</array>
 					</dict>
 					<key>SplitCount</key>
@@ -256,7 +264,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>8B9AD2E90C99AB280017B271</string>
+						<string>8B9AD4690C9AE0960017B271</string>
 						<key>history</key>
 						<array>
 							<string>8B9AD2E70C99AB280017B271</string>
@@ -310,7 +318,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>8B9AD2EA0C99AB280017B271</string>
+						<string>8B9AD46A0C9AE0960017B271</string>
 						<key>history</key>
 						<array>
 							<string>8BBF9FAE0C94520100CAA4F1</string>
@@ -427,7 +435,7 @@
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 367}, {352, 378}}</string>
+							<string>{{0, 387}, {352, 378}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -670,9 +678,9 @@
 		<string>8B9AD2530C999D9C0017B271</string>
 		<string>8B310CE40C92BB690089FE97</string>
 		<string>8BBF9F4C0C944DC700CAA4F1</string>
+		<string>8BBFA1C30C9593CB00CAA4F1</string>
 		<string>1CD10A99069EF8BA00B06720</string>
 		<string>1C0AD2B3069F1EA900FABCE6</string>
-		<string>8BBFA1C30C9593CB00CAA4F1</string>
 		<string>8BD4A5B90C92C63A00243C91</string>
 		<string>/Users/Developer/Caiaq/svn.caiaq.de/Software/iSoundFile/iSoundFile.xcodeproj</string>
 	</array>
@@ -901,7 +909,7 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CDD528C0622207200134675</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>ChannelTableSource.m</string>
+										<string>SoundFile.m</string>
 										<key>StatusBarVisibility</key>
 										<true/>
 									</dict>

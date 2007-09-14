@@ -20,28 +20,8 @@
 
 - (NSString *)windowNibName
 {
-    // Override returning the nib file name of the document
-    // If you need to use a subclass of NSWindowController or if your document supports multiple NSWindowControllers, you should remove this method and override -makeWindowControllers instead.
     return @"SoundFile";
 }
-
-- (IBAction)openAboutPanel:(id)sender
-{
-    NSDictionary *options;
-    NSImage *img;
-
-    img = [NSImage imageNamed: @"Picture 1"];
-    options = [NSDictionary dictionaryWithObjectsAndKeys:
-          @"1.1", @"Version",
-          @"Super App", @"ApplicationName",
-          img, @"ApplicationIcon",
-          @"Copyright 2005-2006, My Great Company", @"Copyright",
-          @"Super App v1.1", @"ApplicationVersion",
-          nil];
-
-    [[NSApplication sharedApplication] orderFrontStandardAboutPanelWithOptions:options];
-}
-
 
 - (void)initFromSndFile
 {
@@ -78,14 +58,14 @@
     
     [labelLength setStringValue: [NSString stringWithCString: str]];
 
-    off_t filesize = file_stat.st_size;
+    float filesize = (float) file_stat.st_size;
     char pot[] = " KMGT", *c = pot;
-    while (filesize > 1024ULL) {
-        filesize /= 1024ULL;
+    while (filesize > 1024.0) {
+        filesize /= 1024.0;
         c++;
     }
     
-    snprintf(str, sizeof(str)-1, "%llu %c%s", filesize, *c, (*c == ' ') ? "ytes" : "");
+    snprintf(str, sizeof(str)-1, "%.2f %cB%s", filesize, *c, (*c == ' ') ? "ytes" : "");
     [labelFilesize setStringValue: [NSString stringWithCString: str]];
 
     int bit_depth = -1;
@@ -186,7 +166,10 @@
         [self bextUpdateTimecodeFromFile];
         [convertKeepBEXT setEnabled: YES];
         [convertKeepBEXT setState: NSOnState];
-    } 
+    } else {
+        [convertKeepBEXT setEnabled: NO];
+        [convertKeepBEXT setState: NSOffState];
+    }
     
     /* Convert tab */
     int major_count, subtype_count, selected_format = 0, m;
@@ -270,14 +253,12 @@
     if (!sndfile) {
         char err[0x100];
         sf_error_str(sndfile, err, sizeof(err));
-        printf ("fname = >%s< err = >%s<\n", fname, err);
         *outError = [NSError errorWithDomain: @"libsndfileError" code:-1
                     userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithCString: err], NSLocalizedDescriptionKey, nil]];
 
         return NO;
     }
     
-    url = [absoluteURL copy];
     stat(fname, &file_stat);
     modified = NO;
     
@@ -290,14 +271,14 @@
     
     if (![absoluteURL isFileURL])
         return NO;
-    
+        
     memcpy(&convertSFInfo, &sfinfo, sizeof(sfinfo));
     BOOL ret = [self convertToURL: absoluteURL 
-                    calledFromConvert: NO];
+                     calledFromConvert: NO];
     
-    if (ret)
+    if (ret && saveOperation == NSSaveOperation)
         modified = NO;
-    
+
     return ret;
 }
 
@@ -308,7 +289,10 @@
 
 - (void)close
 {
-    [audioRenderer release];
+    if (audioRenderer) {
+        [audioRenderer release];
+        audioRenderer = nil;
+    }
     
     if (timer) {
         [timer invalidate];
@@ -318,11 +302,6 @@
     if (sndfile) {
         sf_close(sndfile);
         sndfile = nil;
-    }
-    
-    if (url) {
-        [url release];
-        url = nil;
     }
     
     [super close];
@@ -408,18 +387,16 @@
     if (!sh || !sm || !ss || !ssamp)
         return;
 
-    h = strtol(sh, NULL, 0);
-    m = strtol(sm, NULL, 0);
-    s = strtol(ss, NULL, 0);
-    samp = strtol(ssamp, NULL, 0);
+    h = strtol(sh, NULL, 10);
+    m = strtol(sm, NULL, 10);
+    s = strtol(ss, NULL, 10);
+    samp = strtol(ssamp, NULL, 10);
 
     s += (h * 3600 + m * 60);
 
     UInt64 tc = (UInt64) s * (UInt64) sfinfo.samplerate + (UInt64) samp;
     bext.time_reference_low = tc & 0xffffffff;
     bext.time_reference_high = tc >> 32;
-    
-    modified = YES;
 }
 
 - (IBAction) convertFormatSelected: (id) sender
@@ -475,14 +452,14 @@
 {
     SNDFILE *outfile;
 
-    bool isSameFile = [[newURL path] isEqualToString: [url path]];
+    bool isSameFile = [[newURL path] isEqualToString: [[self fileURL] path]];
 
     char tmpfname[0x100];
     const char *tmp;
     const char *newName;
     
     if (isSameFile) {
-        snprintf(tmpfname, sizeof(tmpfname)-1, "/tmp/isoundfile-%p-%08x", self, [[url path] hash]);
+        snprintf(tmpfname, sizeof(tmpfname)-1, "/tmp/isoundfile-%p-%08x", self, [[[self fileURL] path] hash]);
         newName = tmpfname;
     } else
         newName = [[newURL path] cString];
@@ -510,9 +487,27 @@
     [audioRenderer pause];
     sf_seek(sndfile, 0, SEEK_SET);
 
-    if ([convertKeepBEXT state] == NSOnState)
-        sf_command(outfile, SFC_SET_BROADCAST_INFO, &bext, sizeof(bext));
+    BOOL writeBext = NO;
 
+    if (!calledFromConvert)
+        if ([[bextDescription stringValue] length] != 0 ||
+            [[bextCodingHistory stringValue] length] != 0 ||
+            [[bextOriginationDate stringValue] length] != 0 ||
+            [[bextOriginationTime stringValue] length] != 0 ||
+            [[bextOriginator stringValue] length] != 0 ||
+            [[bextOriginatorRef stringValue] length] != 0 ||
+            [[bextUMID stringValue] length] != 0 ||
+            [[bextTimecode stringValue] length] != 0)
+            writeBext = YES;
+
+    if (calledFromConvert && ([convertKeepBEXT state] == NSOnState))
+        writeBext = YES;
+
+    if (writeBext) {
+        [self bextUpdateTimecode: bextTimecode];
+        sf_command(outfile, SFC_SET_BROADCAST_INFO, &bext, sizeof(bext));
+    }
+    
     tmp = [[stringTitle stringValue] cString];
     if (tmp && (strlen(tmp) > 0))
         sf_set_string(outfile, SF_STR_TITLE, tmp);
@@ -537,31 +532,22 @@
     if (tmp && (strlen(tmp) > 0))
         sf_set_string(outfile, SF_STR_DATE, tmp);
 
-    sf_count_t framesWritten = 0;
-    while (framesWritten < sfinfo.frames) {
-        int i, buf[1024*8];
-        int thisTime = sfinfo.frames - framesWritten;
-        if (thisTime > sizeof(buf) / sizeof(buf[0]))
-            thisTime = sizeof(buf) / sizeof(buf[0]);
-        
-        if (thisTime < sfinfo.channels)
-            break;
-        
-        sf_read_int(sndfile, buf, thisTime);
-        
-        if (sfinfo.channels != convertSFInfo.channels) {
-            for (i = 0; i < thisTime; i++) {
+    sf_count_t framesWritten = 0, foo=0;
+
+    int i, n, buf[1 << 16];
+    
+    while ((n = sf_read_int(sndfile, buf, ARRAY_SIZE(buf)))) {
+        if (sfinfo.channels == convertSFInfo.channels)
+            sf_write_int(outfile, buf, n);
+        else {
+            for (i=0; i < n; i++)
                 if ([convertTableSource channelIsSelected: i % sfinfo.channels])
                     sf_write_int(outfile, buf + i, 1);
-            }
-        } else
-            sf_write_int(outfile, buf, thisTime);
-
-        framesWritten += (sf_count_t) thisTime / (sf_count_t) sfinfo.channels;
-        [convertProgress setDoubleValue: ((double) framesWritten * 100) / (double) sfinfo.frames];
+        }
         
-        if ([NSApp runModalSession:session] != NSRunContinuesResponse)
-            break;
+        framesWritten += n / sfinfo.channels;
+        [convertProgress setDoubleValue: ((double) framesWritten * 100) / (double) sfinfo.frames];
+        [NSApp runModalSession:session];
     }
     
     sf_close(outfile);
@@ -572,6 +558,7 @@
         bzero(&sfinfo, sizeof(sfinfo));
         sndfile = sf_open([[newURL path] cString], SFM_READ, &sfinfo);
         [self initFromSndFile];
+        [self setFileURL: newURL];
     } else if (calledFromConvert) {
         NSDocumentController *controller = [NSDocumentController sharedDocumentController];
         NSError *err;
@@ -590,7 +577,6 @@
 
 - (void)convertFileNameChosen:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
-    
     [sheet orderOut:self];
 
     if (returnCode == 0)
@@ -609,7 +595,7 @@
 {
     SF_FORMAT_INFO tmp_format_info;
     NSSavePanel *panel = [NSSavePanel savePanel];
-    char *name = strdup([[url path] cString]);
+    char *name = strdup([[[self fileURL] path] cString]);
     char *newname = name;
     int i;
     
@@ -641,7 +627,7 @@
     snprintf(tmp, sizeof(tmp) - 1, "%s.%s", newname, tmp_format_info.extension);
     free(name);
 
-    [panel beginSheetForDirectory: [url path] file: [NSString stringWithCString: tmp]
+    [panel beginSheetForDirectory: [[self fileURL] path] file: [NSString stringWithCString: tmp]
                 modalForWindow: [self windowForSheet]
                 modalDelegate:self 
                 didEndSelector:@selector(convertFileNameChosen:returnCode:contextInfo:)
@@ -651,6 +637,8 @@
                         modalDelegate:self 
                         didEndSelector:@selector(convertSheetDidEnd:returnCode:contextInfo:) 
                         contextInfo:NULL];
+
+    free(name);
 }
 
 - (IBAction) calculatePeak: (id) sender
@@ -676,7 +664,7 @@
     int c, n;
     sf_seek(sndfile, 0, SEEK_SET);
 
-    double buf[1024];
+    double buf[1 << 16];
     while((n = sf_read_double(sndfile, buf, ARRAY_SIZE(buf)))) {        
         framesRead += n;
 
@@ -711,6 +699,18 @@
     [self play: nil];
     [playSlider setIntValue: 0];
     [self playSliderMoved: playSlider];
+}
+
+- (BOOL)prepareSavePanel:(NSSavePanel *)savePanel
+{
+    [savePanel setAllowsOtherFileTypes: NO];
+    [savePanel setExtensionHidden: NO];
+    return YES;
+}
+
+- (NSArray *)writableTypesForSaveOperation:(NSSaveOperationType)saveOperation
+{
+    return [NSArray arrayWithObject: [self fileType]];
 }
 
 @end

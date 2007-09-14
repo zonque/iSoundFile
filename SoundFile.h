@@ -13,7 +13,6 @@
     NSTimer *timer;
     AudioRenderer *audioRenderer;
     struct stat file_stat;
-    NSURL *url;
     int convertFormats[0x100];
     ChannelTableSource *convertTableSource;
     ChannelTableSource *peakTableSource;
